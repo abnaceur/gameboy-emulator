@@ -26,14 +26,14 @@ body {
 	z-index: 1;	
 	position: absolute;
 	background-color: #FFFFFF;
-	width: 320px;
-	height: 288px;
+	width: 153px;
+	height: 128px;
 }
 
 #gameboys {
 	position: absolute;
-	top: 50%;
-	left: 50%;
+	top: 43.4%;
+	right: 49%;
 	transition: all 1s;
 	-webkit-transition: all 1s;
 	margin-left: -160px;

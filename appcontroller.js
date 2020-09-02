@@ -22,6 +22,7 @@ function addGB(gameboyDiv) {
 
 	var tools = document.createElement("div");;
 	tools.style.position = "absolute";
+	tools.style.display = "none";
 	tools.style.left = "320px";
 	tools.style.top = "34px";
 	gbContainer.appendChild(tools);

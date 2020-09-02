@@ -14,10 +14,10 @@
 	</script>
 </head>
 <body>
-
+	<img src="../images/bggb.png" style="width: 100%; height: 100%;" />
 	<div class="template">
-		<div id="carttmp" class="cartCtr cartHide">
-			<img src="images/cart.png" width="228px" height="255px" style="position:absolute">
+		<div style="display: none;" id="carttmp" class="cartCtr cartHide">
+			<!-- <img src="images/cart.png" width="228px" height="255px" style="position:absolute"> -->
 			<div id="sampleROM">Load a Sample ROM</div>
 			<div class="cartText" id="romname">No File Selected</div>
 			<div class="cartText" id="batteryname">Last Saved Battery</div>
@@ -28,8 +28,8 @@
 			<input type="file" id="rominput"></input>
 			<input type="file" id="battinput"></input>
 		</div>
-		<div id="controltmp" class="menuCtr">
-			<div id="controlHide" class="menuHide">
+		<div style="display: none;" id="controltmp" class="menuCtr">
+			<div style="display: none;" id="controlHide" class="menuHide">
 				<img src="images/control/bg.png" width="320px" height="288px" style="position:absolute">
 				<img src="images/control/0n.png" class="c0 ctrbg" id="0n">
 				<img src="images/control/0s.png" class="c0 ctrbg cs" id="0s">
@@ -57,18 +57,20 @@
 				<div id="7t" class="c7 contTxt">backspace</div>
 			</div>
 		</div>
-		<div id="optionstmp" class="menuCtr">
+
+		<div style="display: none;" id="optionstmp" class="menuCtr">
 			<div id="optionsHide" class="menuHide">
 				<div class="Minfotext" style="top:132px; width:320px">Options currently Unavailable.</div>
 			</div>
 		</div>
-		<div id="toolstmp" class="menuCtr">
+		
+		<div style="display: none;" id="toolstmp" class="menuCtr">
 			<div id="toolsHide" class="menuHide">
 				<div class="Minfotext" style="top:132px; width:320px">Tools currently Unavailable.</div>
 			</div>
 		</div>
 
-		<div id="blkcover"></div>
+		<div style="display: none;" id="blkcover"></div>
 	</div>
 
 	<div id="gameboys">
