@@ -123,12 +123,12 @@ function fileInHandler(gb, ftype) {
 	
 	if (ftype == "rom") {
 		var filename = gb.GUI.romInput.value.split("\\").pop();
-		if (filename == "") filename = "No File Selected"
-		gb.GUI.romName.innerHTML = filename;
+		// if (filename == "") filename = "No File Selected"
+		// gb.GUI.romName.innerHTML = filename;
 	} else {
 		var filename = gb.GUI.battInput.value.split("\\").pop();
-		if (filename == "") filename = "Last Saved Battery"
-		gb.GUI.battName.innerHTML = filename;
+		// if (filename == "") filename = "Last Saved Battery"
+		// gb.GUI.battName.innerHTML = filename;
 	}
 }
 
@@ -140,6 +140,7 @@ function getChildById(id, element) {
 
 function cartClicked(gb) {
 	if (gb.GUI.cartS == 0) {
+		gb.GUI.cart.children[0].src = "images/cart1.png"
 		gb.GUI.cart.className = "cartCtr cartShow"
 		gb.GUI.blkcover.style.opacity = 0.66;
 		gb.GUI.blkcover.style.pointerEvents = "auto";
@@ -192,7 +193,9 @@ function processCartDialog(gb, load) {
 	setTimeout(function() {gb.GUI.cart.style.zIndex = 0;}, 200)
 	gb.GUI.blkcover.style.opacity = 0;
 	gb.GUI.blkcover.style.pointerEvents = "none";
-	gb.GUI.cart.className = "cartCtr cartHide cartHA"
+	console.log("gb.GUI.cart.children[0].src :", gb.GUI.cart.children[0].src);
+	gb.GUI.cart.children[0].src = "images/cart1.png";
+	gb.GUI.cart.className = "cartCtr cartHide cartHA";
 }
 
 numberToControl = [

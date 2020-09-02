@@ -187,16 +187,16 @@ body {
 }
 
 .cartCtr {
-	padding-left: 46px;
+	padding-left: 11px;
 	padding-right: 46px;
-	padding-top: 100px;
+	padding-top: 28px;
 	width: 228px;
 	display: inline-block;
 	position: absolute;
 }
 
 .cartHide:hover {
-	margin-top: -170px;
+	margin-top: -105px;
 }
 
 .cartHide {
@@ -325,7 +325,7 @@ body {
 	-webkit-border-radius: 5px;
 	-moz-border-radius: 5px;
 	border-radius: 5px;
-	background: #FFFFFF;
+	background: rgb(71, 22, 22);
 }
 
 .cartBut:hover {
@@ -337,13 +337,14 @@ body {
 }
 
 #romBut {
-	top: 223px;
-	left: 139px;
+	top: 100px;
+	left: 39px;
 }
 
 #battBut {
 	top: 257px;
 	left: 139px;
+	display: none;
 }
 
 #rominput {
@@ -377,13 +378,15 @@ body {
 }
 
 #cartCancel {
-	width: 56px;
-	left: 88px;
+	top: 140px;
+	width: 36px;
+	left: 20px;
 }
 
 #cartLoad {
+	top: 140px;
 	width: 44px;
-	left: 188px;
+	left: 90px;
 }
 
 #blkcover {
