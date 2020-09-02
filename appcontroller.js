@@ -36,7 +36,7 @@ function addGB(gameboyDiv) {
 		buttonctr.className = "toolsButton"
 		buttonctr.onclick = eval("(function() {toolFunctions["+i+"](gameboys["+(gameboys.length-1)+"])})");
 
-		button.src = "images/t"+(i+1)+".png";
+		button.src = "images/"+(i+1)+"s.png";
 		button.style.width = "100px";
 		button.style.height = "32px";
 		buttonctr.appendChild(button);
