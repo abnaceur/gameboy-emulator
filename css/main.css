@@ -378,15 +378,17 @@ body {
 }
 
 #cartCancel {
-	top: 140px;
-	width: 36px;
-	left: 20px;
+	height: 10px;
+    top: 147px;
+    width: 31px;
+    left: 37px;
 }
 
 #cartLoad {
-	top: 140px;
-	width: 44px;
-	left: 90px;
+    top: 146px;
+    height: 10px;
+    width: 26px;
+    left: 96px;
 }
 
 #blkcover {
