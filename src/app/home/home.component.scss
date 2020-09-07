@@ -10,4 +10,29 @@
       }
       
 
+      #debug { 
+        color: white;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .section {
+        display: flex;
+        flex-direction: row;
+      }
+
+      .gb-player {
+        display: flex;
+        flex-direction: column;
+        align-content: center;
+        flex-direction: center;
+        padding-right: 150px;   
+      }
+
+      .header-title {
+        // width: 100vw;
+      }
 }

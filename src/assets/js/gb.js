@@ -41,6 +41,8 @@ window.GBMasterClass = function () {
 
 window.gb = function (file, canvas, options) {
 
+	var activeDebuger = document.querySelector("#active-debug");
+
 	var isDefaultLoaded = false;
 	if (options == null) {
 		var options = { rootDir: "" }
@@ -224,7 +226,7 @@ window.gb = function (file, canvas, options) {
 	}
 
 	var loadCGBbios = new XMLHttpRequest();
-	loadCGBbios.open("GET", options.rootDir + "gbcbios.bin");
+	loadCGBbios.open("GET", options.rootDir + "/assets/gbcbios.bin");
 	loadCGBbios.responseType = "arraybuffer";
 	loadCGBbios.send();
 	loadCGBbios.onload = function () {
@@ -1988,8 +1990,6 @@ window.gb = function (file, canvas, options) {
 	}
 
 	this.audioSyncUpdate = function () {
-		//document.getElementById("debug").innerHTML = Instructions[MemRead(535)]+"<br><br>"+PrefixCBI[MemRead(536)];
-		//Cycles -= 8BI;
 		try {
 			if (GBObj.paused) return; //don't run!
 			if (!GBObj.options.cButByte) GBObj.prepareButtonByte();
@@ -2109,7 +2109,7 @@ window.gb = function (file, canvas, options) {
 			if ((divCounts & 15) == 0) IORAM[0x04] = (IORAM[0x04] + 1) & 0xFF; //"hey rhys why don't you just do IORAM[0x04]++ ???" i can't because apple decided to break the basic functionality of typed arrays like utter twats
 			if ((IORAM[0x07] & 4) && ((divCounts & timerMods[IORAM[0x07] & 3]) == 0)) {
 				IORAM[0x05] = (IORAM[0x05] + 1) & 0xFF;
-				//document.getElementById("debug").innerHTML = IORAM[0x05];
+				// document.getElementById("debug").innerHTML = IORAM[0x05];
 				if (IORAM[0x05] == 0) {
 					IORAM[0x05] = IORAM[0x06];
 					IORAM[0x0F] |= 0x4
@@ -2225,7 +2225,7 @@ window.gb = function (file, canvas, options) {
 		//}
 
 		instCount++;
-		//if ((!biosActive) && (instCount%10 == 0)) appendRegistersDebug();
+		if ((!biosActive) && (instCount%10 == 0) && activeDebuger.checked) appendRegistersDebug();
 	}
 
 	function appendRegistersDebug() {
@@ -2238,6 +2238,8 @@ window.gb = function (file, canvas, options) {
 		registerDebug.push(registers[6]);
 		registerDebug.push(PC);
 		registerDebug.push(SP);
+
+		printDebug();
 	}
 
 	function CGBDMAStep(copy) {
