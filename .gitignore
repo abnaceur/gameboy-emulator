@@ -2,3 +2,5 @@
 *.vim
 commit_msg_template
 node_modules
+release
+dist
