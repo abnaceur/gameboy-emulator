@@ -75,12 +75,7 @@ window.gb = function (file, canvas, options) {
 		loadfile.onreadystatechange = function () { this.mime = this.getResponseHeader('content-type'); };
 		loadfile.onload = function () {
 			GBObj.paused = (pauseAfter || false);
-			if ((loadfile.mime == "application/zip") && (JSZip != null)) {
-				var zip = new JSZip(loadfile.response);
-				var file = zip.file(/.gb/)[0];
-				GBObj.filename = file.name;
-				GBObj.loadROMBuffer(file.asArrayBuffer()); //load first file with extension .gb or .gbc
-			} else GBObj.loadROMBuffer(loadfile.response);
+			GBObj.loadROMBuffer(loadfile.response);
 		}
 		loadfile.onerror = function () {
 			alert("Failed to load " + url + "! Are CORS requests enabled on the server?")
