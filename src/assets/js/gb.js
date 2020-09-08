@@ -59,7 +59,6 @@ window.gb = function (file, canvas, options) {
 	this.loadState = loadState;
 	this.saveState = saveState;
 
-	window.addEventListener("unload", saveBattery)
 	var GBObj = this;
 
 	this.loadROM = function (url, pauseAfter) {
@@ -82,17 +81,12 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	this.loadROMBuffer = function (buffer, battery) { //battery is an optional parameter
+	this.loadROMBuffer = function (buffer) {
 		if (buffer instanceof ArrayBuffer) game = new Uint8Array(buffer);
 		else if (buffer instanceof Uint8Array) game = buffer;
 		else alert(buffer);
 		GBObj.game = game;
 		gameLoaded = true;
-		if (battery != null) {
-			ROMID = generateUniqueName();
-			CRAM = new Uint8Array(battery);
-			saveBattery();
-		}
 		if (biosLoaded == 2) init();
 	}
 
@@ -127,10 +121,7 @@ window.gb = function (file, canvas, options) {
 
 	var getGamepads = navigator.webkitGamepads || navigator.webkitGetGamepads || navigator.getGamepads;
 
-	var p = navigator.platform
-	var iOS = (p === 'iPad' || p === 'iPhone' || p === 'iPod');
-	if (iOS) setInterval(saveBattery, 1000);
-
+	
 	var NoAudioAPI = false;
 	if (typeof AudioContext !== 'undefined') {
 		GBAudioContext = new AudioContext();
@@ -1790,16 +1781,6 @@ window.gb = function (file, canvas, options) {
 				CRAM[i] = battery.charCodeAt(i);
 			}
 		}
-	}
-
-	function saveBattery() {
-		if (!MBC) return;
-		if (MBC.hardware.indexOf("BATTERY") == -1) return;
-		var battery = "";
-		for (var i = 0; i < CRAM.length; i++) {
-			battery += String.fromCharCode(CRAM[i]);
-		}
-		localStorage["battery/" + ROMID] = battery;
 	}
 
 	// ----- CPU EMULATION -----
