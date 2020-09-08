@@ -72,7 +72,6 @@ window.gb = function (file, canvas, options) {
 		GBObj.filename = filename[filename.length - 1];
 		GBObj.paused = true;
 
-		loadfile.onprogress = drawProgress;
 		loadfile.onreadystatechange = function () { this.mime = this.getResponseHeader('content-type'); };
 		loadfile.onload = function () {
 			GBObj.paused = (pauseAfter || false);
@@ -2030,32 +2029,6 @@ window.gb = function (file, canvas, options) {
 			ctx.drawImage(internalCanvas, 0, 0, canvas.width, canvas.height);
 			alert("Something went horribly wrong! Here's the stack trace:\n" + err.stack);
 		}
-	}
-
-
-
-	function drawProgress(e) {
-		var progressSeg = ["#B90546", "#5255A5", "#79AD36", "#DDB10A", "#009489"]
-
-		internalCtx.fillStyle = "#FFFFFF"
-		internalCtx.fillRect(0, 0, 160, 144);
-
-		internalCtx.fillStyle = "#EEEEEE"
-		internalCtx.fillRect(30, 71, 100, 2);
-		var percent = e.loaded / e.total;
-
-		for (var i = 0; i < 5; i++) {
-			var ext = Math.min(0.2, percent - (i * 0.2));
-			if (ext > 0) {
-				internalCtx.fillStyle = progressSeg[i]
-				internalCtx.fillRect(30 + i * 20, 71, ext * 100, 2);
-			}
-		}
-
-		internalCtx.fillStyle = "rgba(0, 0, 0, 0.2)"
-		internalCtx.fillRect(30, 71, 100, 1);
-
-		ctx.drawImage(internalCanvas, 0, 0, canvas.width, canvas.height);
 	}
 
 	function drawFrame() {
