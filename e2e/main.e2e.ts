@@ -3,13 +3,13 @@ import { SpectronClient } from 'spectron';
 
 import commonSetup from './common-setup';
 
-describe('angular-electron App', function () {
+describe('gbmu App', function () {
 
   commonSetup.apply(this);
 
   let client: SpectronClient;
 
-  beforeEach(function() {
+  beforeEach(function () {
     client = this.app.client;
   });
 
