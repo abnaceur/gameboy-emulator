@@ -35,7 +35,7 @@ To be able to emulate a Gameboy, we have to understand The Gameboy computer like
 
 The CPU in the Gameboy, like in a computer, is a processing Unit. In our case, it is single cycled which means that when the Gameboy starts or in ou case the program boot, it enters a single loop of operations:
 
-	![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/CPU_Loop_Diagram.png)
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/CPU_Loop_Diagram.png)
 
 ## Sources
 
