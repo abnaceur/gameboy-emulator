@@ -2,21 +2,21 @@
 
  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/gb.png)
 
-### Technical documentation
+## Technical documentation
 
 This file is a technical documentation of this project that aims to reproduce the game boy / gameboy color emulator on the web.
 
-### Team
+## Team
 Apolline Saint Mleux ***apsaint-@student.42.fr***
 Dove Palombo ***dpalombo@student.42.fr***
 Abdeljalil NACEUR - ***contact@naceur-abdeljalil.com***
 
-### Technologies
+## Technologies
 - Angular v10.0.14
 - Electron v10.1.0
 - Electron Builder v22.8.0
 
-### What is an emulator?
+## What is an emulator?
 
 To understand our project, it is necessary to learn what an emulator is and how it works.
 An emulator is a computer or program that simulates or imitates another computer or program. 
@@ -25,13 +25,19 @@ To realize that, we had to build a similar virtual architecture as the original 
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/arch.png)
 
-### Architecture
+## Architecture
+
+To be able to emulate a Gameboy, we have to understand The Gameboy computer like architecture.
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Architecture_Overview_GB_Diagram.png)
 
+### CPU (Central Processing Unit)
 
+The CPU in the Gameboy, like in a computer, is a processing Unit. In our case, it is single cycled which means that when the Gameboy starts or in ou case the program boot, it enters a single loop of operations:
 
-### Sources
+	![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/CPU_Loop_Diagram.png)
+
+## Sources
 
 	- https://www.lifewire.com/what-is-an-emulator-4687005
 	- 
