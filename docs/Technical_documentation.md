@@ -23,7 +23,7 @@ To realize that, we had to build a similar virtual architecture as the original 
 
 ### Architecture
 
-https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Architecture_Overview_GB_Diagram.png
+        ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Architecture_Overview_GB_Diagram.png)
 
 
 
