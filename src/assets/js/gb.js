@@ -42,7 +42,9 @@ window.GBMasterClass = function () {
 window.gb = function (file, canvas, options) {
 
 	var activeDebuger = document.querySelector("#active-debug");
-
+	var saveStateBtn = document.querySelector("#btn-saveState");
+	var loadStateBtn = document.querySelector("#btn-loadState");
+	
 	var isDefaultLoaded = false;
 	if (options == null) {
 		var options = { rootDir: "" }
@@ -121,7 +123,7 @@ window.gb = function (file, canvas, options) {
 
 	var getGamepads = navigator.webkitGamepads || navigator.webkitGetGamepads || navigator.getGamepads;
 
-	
+
 	var NoAudioAPI = false;
 	if (typeof AudioContext !== 'undefined') {
 		GBAudioContext = new AudioContext();
@@ -235,6 +237,7 @@ window.gb = function (file, canvas, options) {
 		keysArray[evt.keyCode] = 0;
 
 		var stateNum = controlKeyConfig.STATES.indexOf(evt.keyCode)
+		// console.log("evt.keyCode :", evt.keyCode, keysArray[evt.keyCode], stateNum);
 		if (stateNum != -1) {
 			evt.preventDefault();
 			if (keysArray[16] == 0) {
@@ -250,6 +253,11 @@ window.gb = function (file, canvas, options) {
 	function keyUpHandler(evt) {
 		keysArray[evt.keyCode] = 1;
 	}
+
+	saveStateBtn.addEventListener("click", handleSaveState);
+	loadStateBtn.addEventListener("click", handleLoadState);
+	loadStateBtn.style.display = "none";
+	var isStateSaved = false;
 
 	function getROMName() {
 		var name = "";
@@ -334,6 +342,8 @@ window.gb = function (file, canvas, options) {
 	}
 
 	function saveState() {
+		isStateSaved = true;
+		loadStateBtn.style.display = "initial";
 		return {
 			VRAM: byteToString(VRAM),
 			RAM: byteToString(RAM),
@@ -427,12 +437,15 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	function testSaveState() {
-		savewhatever = JSON.stringify(saveState());
+	function handleSaveState() {
+		saveStateData = JSON.stringify(saveState());
 	}
 
-	function testLoadState() {
-		loadState(JSON.parse(savewhatever));
+	function handleLoadState() {
+		if (isStateSaved) {
+			loadStateBtn.style.display = "initial"
+			loadState(JSON.parse(saveStateData));
+		}
 	}
 
 	function objectifyAudioEngine() {
@@ -2174,7 +2187,7 @@ window.gb = function (file, canvas, options) {
 		//}
 
 		instCount++;
-		if ((!biosActive) && (instCount%10 == 0) && activeDebuger.checked) appendRegistersDebug();
+		if ((!biosActive) && (instCount % 10 == 0) && activeDebuger.checked) appendRegistersDebug();
 	}
 
 	function appendRegistersDebug() {
