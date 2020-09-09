@@ -1,5 +1,7 @@
 # GMBU PROJECT
 
+ ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/gb.png)
+
 ### Technical documentation
 
 This file is a technical documentation of this project that aims to reproduce the game boy / gameboy color emulator on the web.
@@ -20,6 +22,8 @@ To understand our project, it is necessary to learn what an emulator is and how 
 An emulator is a computer or program that simulates or imitates another computer or program. 
 In our project, we aim to make it possible to run a Gameboy or Gameboy Color ROM game on a computer. 
 To realize that, we had to build a similar virtual architecture as the original Gameboy.
+
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/arch.png)
 
 ### Architecture
 
