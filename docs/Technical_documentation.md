@@ -38,10 +38,11 @@ The CPU in the Gameboy, like in a computer, is a processing Unit. In our case, i
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/CPU_Loop_Diagram.png)
 
 To setup this loop of execution, we have to seperate different functionnalities into distinct blocks:
-	- Instruction Decoder
-	- Arithmetic Unit
-	- Current State Registers: as the CPU is running, it keeps a few state variables like the current location (pointer to the next).
-	- Memory interface (MMU Memory Management Unit): keep the result of execution and to fetch a program from
+
+- Instruction Decoder
+- Arithmetic Unit
+- Current State Registers: as the CPU is running, it keeps a few state variables like the current location (pointer to the next).
+- Memory interface (MMU Memory Management Unit): keep the result of execution and to fetch a program from
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/CPU_Detail_Diagram.png)
 
