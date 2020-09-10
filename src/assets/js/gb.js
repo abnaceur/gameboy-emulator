@@ -2209,7 +2209,7 @@ window.gb = function (file, canvas, options) {
 		//}
 
 		instCount++;
-		if ((!biosActive) && (instCount % 10 == 0) && activeDebuger.checked) appendRegistersDebug();
+		if ((!biosActive) && (instCount % 25000 == 0) && activeDebuger.checked) appendRegistersDebug();
 	}
 
 	function appendRegistersDebug() {
