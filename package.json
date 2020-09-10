@@ -77,5 +77,10 @@
   },
   "engines": {
     "node": ">=10.13.0"
+  },
+  "dependencies": {
+    "angular-particle": "^1.0.4",
+    "bootstrap": "^4.5.2",
+    "ngx-animated-gradient": "^1.1.0"
   }
 }

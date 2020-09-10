@@ -1,0 +1,169 @@
+.backgd {
+    background-color: black;
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+
+.gbImage {
+    position: fixed;
+    top: -16px;
+    left: -173px;
+    width: 850px;
+    height: 805px;
+}
+
+.fullScreen {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    /* bring your own prefixes */
+    transform: translate(-50%, -50%);
+}
+
+.screenCanvas {
+    position: fixed;
+    left: 117px;
+    width: 274px;
+    top: 94px;
+    height: 230px;
+}
+
+.arrowT {
+    cursor: pointer;
+    position: fixed;
+    top: 459px;
+    left: 82px;
+    width: 48px;
+    height: 41px;
+
+    &:hover {
+        background-color: darkgrey;
+        opacity: 0.2;
+    }
+}
+
+.arrowB {
+    cursor: pointer;
+    position: fixed;
+    top: 541px;
+    left: 81px;
+    width: 48px;
+    height: 41px;
+
+    &:hover {
+        background-color: darkgrey;
+        opacity: 0.2;
+    }
+}
+
+.arrowR {
+    cursor: pointer;
+    position: fixed;
+    top: 500px;
+    left: 121px;
+    width: 48px;
+    height: 41px;
+
+    &:hover {
+        background-color: darkgrey;
+        opacity: 0.2;
+    }
+}
+
+.arrowL {
+    cursor: pointer;
+    position: fixed;
+    top: 500px;
+    left: 38px;
+    width: 48px;
+    height: 41px;
+
+    &:hover {
+        background-color: darkgrey;
+        opacity: 0.2;
+    }
+}
+
+.bSelect {
+    cursor: pointer;
+    position: fixed;
+    top: 606px;
+    left: 173px;
+    width: 24px;
+    height: 60px;
+    transform: rotate(65deg);
+
+    &:hover {
+        background-color: darkgrey;
+        opacity: 0.2;
+    }
+}
+
+.bStart {
+    cursor: pointer;
+    position: fixed;
+    top: 606px;
+    left: 256px;
+    width: 24px;
+    height: 60px;
+    transform: rotate(65deg);
+
+    &:hover {
+        background-color: darkgrey;
+        opacity: 0.2;
+    }
+}
+
+.bB {
+    cursor: pointer;
+    position: fixed;
+    top: 495px;
+    left: 318px;
+    width: 70px;
+    height: 70px;
+    border-radius: 100%;
+
+    &:hover {
+        background-color: darkgrey;
+        opacity: 0.2;
+    }
+}
+
+.bA {
+    cursor: pointer;
+    position: fixed;
+    top: 460px;
+    left: 397px;
+    width: 70px;
+    height: 70px;
+    border-radius: 100%;
+
+    &:hover {
+        background-color: darkgrey;
+        opacity: 0.2;
+    }
+}
+
+.inputFile {
+    position: fixed;
+    top: 728px;
+    left: 10px;
+    width: 149px;
+}
+
+.saveLoadGroup {
+    position: fixed;
+    top: 685px;
+    left: 10px;
+    width: 149px;
+}
+
+.debugButton {
+    position: fixed;
+    top: 722px;
+    left: 392px;
+    transform: rotate(-29deg);
+}

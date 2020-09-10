@@ -3,34 +3,18 @@
 
 <head>
   <meta charset="utf-8">
-  <title>GNMU</title>
+  <title>GBMU</title>
   <base href="/">
 
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="assets/icons/favicon.ico">
+  <script src="assets/js/particles.min.js"></script>
   <script src="assets/js/gb.js"></script>
+
 </head>
 
-<body onload="gameboy = new gb('./assets/default.gbc', document.getElementById('gameboy'));">
-  <app-root>Loading...</app-root>
-
-  <script>
-    setTimeout(() => {
-      function loadROMfileReader(evt) {
-        var file = evt.target.files[0];
-        var reader = new FileReader();
-        reader.onload = (function (theFile) {
-          return function (e) {
-            gameboy.loadROMBuffer(e.target.result);
-          };
-        })(file);
-        reader.readAsArrayBuffer(file);
-      }
-
-      document.getElementById("file").addEventListener('change', loadROMfileReader, false);
-    }, 1000)
-
-  </script>
+<body>
+  <app-root></app-root>
 </body>
 
 </html>

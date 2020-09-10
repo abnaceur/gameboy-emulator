@@ -15,6 +15,7 @@ export class ElectronService {
   remote: typeof remote;
   childProcess: typeof childProcess;
   fs: typeof fs;
+  isFullScreen: boolean
 
   get isElectron(): boolean {
     return !!(window && window.process && window.process.type);

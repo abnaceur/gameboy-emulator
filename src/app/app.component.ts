@@ -13,6 +13,15 @@ export class AppComponent {
     private electronService: ElectronService,
     private translate: TranslateService
   ) {
+
+    window.onkeyup = (e) => {
+      var key = e.key
+      if (key === 'Escape') {
+        this.electronService.ipcRenderer.send('fullscreen', false)
+        this.electronService.isFullScreen = false
+      }
+    }
+
     this.translate.setDefaultLang('en');
     console.log('AppConfig', AppConfig);
 

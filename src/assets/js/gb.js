@@ -44,7 +44,8 @@ window.gb = function (file, canvas, options) {
 	var activeDebuger = document.querySelector("#active-debug");
 	var saveStateBtn = document.querySelector("#btn-saveState");
 	var loadStateBtn = document.querySelector("#btn-loadState");
-	
+
+
 	var isDefaultLoaded = false;
 	if (options == null) {
 		var options = { rootDir: "" }
@@ -233,11 +234,12 @@ window.gb = function (file, canvas, options) {
 	document.addEventListener("keydown", keyDownHandler, false);
 	document.addEventListener("keyup", keyUpHandler, false);
 
+
 	function keyDownHandler(evt) {
 		keysArray[evt.keyCode] = 0;
 
 		var stateNum = controlKeyConfig.STATES.indexOf(evt.keyCode)
-		// console.log("evt.keyCode :", evt.keyCode, keysArray[evt.keyCode], stateNum);
+		console.log("evt.keyCode :", evt, evt.keyCode, keysArray[evt.keyCode], stateNum, controlKeyConfig.STATES);
 		if (stateNum != -1) {
 			evt.preventDefault();
 			if (keysArray[16] == 0) {
@@ -251,8 +253,51 @@ window.gb = function (file, canvas, options) {
 	}
 
 	function keyUpHandler(evt) {
+		console.log('up', evt);
 		keysArray[evt.keyCode] = 1;
 	}
+
+
+	document.querySelector("#arrowT").addEventListener('click', () => {
+		keyDownHandler({ keyCode: 38 });
+		keyUpHandler({ keyCode: 38 })
+	});
+
+	document.querySelector("#arrowB").addEventListener('click', () => {
+		keyDownHandler({ keyCode: 40 });
+		keyUpHandler({ keyCode: 40 })
+	});
+
+	document.querySelector("#arrowR").addEventListener('click', () => {
+		keyDownHandler({ keyCode: 39 });
+		keyUpHandler({ keyCode: 39 })
+	});
+
+	document.querySelector("#arrowL").addEventListener('click', () => {
+		keyDownHandler({ keyCode: 37 });
+		keyUpHandler({ keyCode: 37 })
+	});
+
+	document.querySelector("#bSelect").addEventListener('click', () => {
+		keyDownHandler({ keyCode: 32 });
+		keyUpHandler({ keyCode: 32 })
+	});
+
+	document.querySelector("#bStart").addEventListener('click', () => {
+		keyDownHandler({ keyCode: 13 });
+		keyUpHandler({ keyCode: 13 })
+	});
+
+	document.querySelector("#bA").addEventListener('click', () => {
+		keyDownHandler({ keyCode: 88 });
+		keyUpHandler({ keyCode: 88 })
+	});
+
+	document.querySelector("#bB").addEventListener('click', () => {
+		keyDownHandler({ keyCode: 90 });
+		keyUpHandler({ keyCode: 90 })
+	});
+
 
 	saveStateBtn.addEventListener("click", handleSaveState);
 	loadStateBtn.addEventListener("click", handleLoadState);
@@ -979,7 +1024,6 @@ window.gb = function (file, canvas, options) {
 		} else if (true) { //DMG only, CGB is always accessable ---- masterClock-WaveRAMCycles <= 16 ---- currently disabled until accurate Wave RAM Read timings are achieved
 			return IORAM[0x30 + calculateCurrentWaveRam()]
 		} else {
-			return 0xFF;
 		}
 	}
 	function WaveRAMWrite(a, b) {
@@ -1294,20 +1338,6 @@ window.gb = function (file, canvas, options) {
 	var lengthPtrs = [0x14, 0x19, 0x1E, 0x23]
 
 	function triggerChannel(channel) { //todo: simplify.
-		if (false) { //DISABLED until accurate timings are achieved 
-			if ((channel == 2) && (IORAM[0x26] & 4)) { //special dmg behaviour corrupts wave ram while on
-				var temp = Math.floor(AudioEngine[2].phase / 2);
-				if (temp > 3) { //corrupt first 3 bytes
-					temp = Math.floor(temp / 4) * 4 //align with 4 byte section
-					IORAM[0x30] = IORAM[0x30 + (temp++)]
-					IORAM[0x31] = IORAM[0x30 + (temp++)]
-					IORAM[0x32] = IORAM[0x30 + (temp++)]
-					IORAM[0x33] = IORAM[0x30 + (temp++)] //write first 4 bytes with bytes aligned to current position
-				} else { //only corrupt first byte
-					IORAM[0x30] = IORAM[0x30 + temp] //first byte = current read byte
-				}
-			}
-		}
 
 		if (channel < 3) {
 			setChannelFrequency(channel);

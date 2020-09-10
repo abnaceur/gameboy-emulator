@@ -12,16 +12,38 @@ function createWindow() {
     win = new electron_1.BrowserWindow({
         x: 0,
         y: 0,
-        width: size.width,
-        height: size.height,
+        width: 1000,
+        height: 600,
+        show: true,
+        center: true,
+        transparent: true,
+        resizable: false,
+        icon: path.join(__dirname, 'assets/pikachu.png'),
         webPreferences: {
             nodeIntegration: true,
             allowRunningInsecureContent: (serve) ? true : false,
             enableRemoteModule: false // true if you want to use remote module in renderer context (ie. Angular)
         },
     });
+    win.setMenuBarVisibility(false);
+    win.center();
+    electron_1.ipcMain.on('resize', function (event, arg) {
+        win.resizable = true;
+        win.setFullScreen(false);
+        win.setSize(arg.width, arg.height);
+        win.resizable = false;
+        win.center();
+        win.setMenuBarVisibility(false);
+    });
+    electron_1.ipcMain.on('fullscreen', function (event, arg) {
+        win.resizable = true;
+        win.setFullScreen(arg);
+        win.resizable = false;
+        win.center();
+        win.setMenuBarVisibility(false);
+    });
     if (serve) {
-        win.webContents.openDevTools();
+        //win.webContents.openDevTools();
         require('electron-reload')(__dirname, {
             electron: require(__dirname + "/node_modules/electron")
         });

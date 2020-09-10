@@ -8,6 +8,7 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { CoreModule } from './core/core.module';
 
 import { AppRoutingModule } from './app-routing.module';
+import { NgxAnimatedGradientModule } from 'ngx-animated-gradient';
 
 // NG Translate
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
@@ -15,8 +16,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
 import { AppComponent } from './app.component';
 import { GameboyComponent } from './components/gameboy/gameboy.component';
-import { DebugComponent } from './components/debug/debug.component';
-import { RegistersComponent } from './components/registers/registers.component';
+import { HomeComponent } from './components/home/home.component';
 
 // AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
@@ -27,8 +27,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   declarations: [
     AppComponent,
     GameboyComponent,
-    DebugComponent,
-    RegistersComponent
+    HomeComponent,
   ],
   imports: [
     BrowserModule,
@@ -36,6 +35,7 @@ export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
     HttpClientModule,
     CoreModule,
     AppRoutingModule,
+    NgxAnimatedGradientModule,
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,

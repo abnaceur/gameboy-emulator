@@ -1,0 +1,135 @@
+import { Component, OnInit } from '@angular/core';
+import { ElectronService } from 'app/core/services';
+declare var particlesJS: any;
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.scss']
+})
+export class HomeComponent implements OnInit {
+
+  ParticlesConfig = {
+    "particles": {
+      "number": {
+        "value": 34,
+        "density": {
+          "enable": true,
+          "value_area": 552
+        }
+      },
+      "color": {
+        "value": "#fff"
+      },
+      "shape": {
+        "type": "image",
+        "stroke": {
+          "width": 0,
+          "color": "#000000"
+        },
+        "polygon": {
+          "nb_sides": 5
+        },
+        "image": {
+          "src": "../../../assets/pikachu.png",
+          "width": 100,
+          "height": 100
+        }
+      },
+      "opacity": {
+        "value": 0.1843923869995351,
+        "random": true,
+        "anim": {
+          "enable": true,
+          "speed": 0.9744926547616141,
+          "opacity_min": 0.11369080972218831,
+          "sync": false
+        }
+      },
+      "size": {
+        "value": 76.16207289111233,
+        "random": false,
+        "anim": {
+          "enable": false,
+          "speed": 40,
+          "size_min": 0.1,
+          "sync": false
+        }
+      },
+      "line_linked": {
+        "enable": false,
+        "distance": 785.6719098241061,
+        "color": "#ffffff",
+        "opacity": 0.4,
+        "width": 2
+      },
+      "move": {
+        "enable": true,
+        "speed": 6,
+        "direction": "bottom-left",
+        "random": true,
+        "straight": true,
+        "out_mode": "out",
+        "bounce": false,
+        "attract": {
+          "enable": false,
+          "rotateX": 2805.971106514665,
+          "rotateY": 7455.866083024682
+        }
+      }
+    },
+    "interactivity": {
+      "detect_on": "canvas",
+      "events": {
+        "onhover": {
+          "enable": true,
+          "mode": "repulse"
+        },
+        "onclick": {
+          "enable": true,
+          "mode": "bubble"
+        },
+        "resize": true
+      },
+      "modes": {
+        "grab": {
+          "distance": 400,
+          "line_linked": {
+            "opacity": 0.5
+          }
+        },
+        "bubble": {
+          "distance": 400,
+          "size": 4,
+          "duration": 0.3,
+          "opacity": 1,
+          "speed": 3
+        },
+        "repulse": {
+          "distance": 170.53621458328246,
+          "duration": 0.4
+        },
+        "push": {
+          "particles_nb": 4
+        },
+        "remove": {
+          "particles_nb": 2
+        }
+      }
+    },
+    "retina_detect": false
+  }
+  constructor(private readonly electronService: ElectronService) {
+  }
+
+  goToGameboy() {
+    this.electronService.ipcRenderer.send('resize', { width: 500, height: 770 })
+  }
+
+  ngOnInit(): void {
+    particlesJS('particles-js', this.ParticlesConfig, function () {
+      console.log('callback - particles.js config loaded');
+    });
+  }
+
+}

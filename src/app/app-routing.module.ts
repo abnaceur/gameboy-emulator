@@ -1,11 +1,16 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { GameboyComponent } from './components/gameboy/gameboy.component';
+import { HomeComponent } from './components/home/home.component';
 
 const routes: Routes = [
   {
-    path: '**',
-    component: GameboyComponent
+    path: '',
+    component: HomeComponent,
+  },
+  {
+    path: 'game',
+    component: GameboyComponent,
   }
 ];
 

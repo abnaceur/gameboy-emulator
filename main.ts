@@ -1,6 +1,7 @@
-import { app, BrowserWindow, screen } from 'electron';
+import { app, BrowserWindow, screen, ipcMain } from 'electron';
 import * as path from 'path';
 import * as url from 'url';
+import { electron } from 'process';
 
 let win: BrowserWindow = null;
 const args = process.argv.slice(1),
@@ -15,18 +16,42 @@ function createWindow(): BrowserWindow {
   win = new BrowserWindow({
     x: 0,
     y: 0,
-    width: size.width,
-    height: size.height,
+    width: 1000,
+    height: 600,
+    show: true,
+    center: true,
+    transparent: true,
+    resizable: false,
+    icon: path.join(__dirname, 'assets/pikachu.png'),
     webPreferences: {
       nodeIntegration: true,
       allowRunningInsecureContent: (serve) ? true : false,
-      enableRemoteModule : false // true if you want to use remote module in renderer context (ie. Angular)
+      enableRemoteModule: false // true if you want to use remote module in renderer context (ie. Angular)
     },
   });
+  win.setMenuBarVisibility(false)
+  win.center();
+
+  ipcMain.on('resize', (event, arg) => {
+    win.resizable = true
+    win.setFullScreen(false)
+    win.setSize(arg.width, arg.height)
+    win.resizable = false
+    win.center();
+    win.setMenuBarVisibility(false)
+  })
+
+  ipcMain.on('fullscreen', (event, arg) => {
+    win.resizable = true
+    win.setFullScreen(arg)
+    win.resizable = false
+    win.center();
+    win.setMenuBarVisibility(false)
+  })
 
   if (serve) {
 
-    win.webContents.openDevTools();
+    //win.webContents.openDevTools();
 
     require('electron-reload')(__dirname, {
       electron: require(`${__dirname}/node_modules/electron`)
@@ -40,6 +65,8 @@ function createWindow(): BrowserWindow {
       slashes: true
     }));
   }
+
+
 
   // Emitted when the window is closed.
   win.on('closed', () => {
