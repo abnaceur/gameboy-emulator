@@ -21,7 +21,6 @@
             ],
             "styles": [
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.scss"
             ],
             "scripts": [
               "./src/assets/js/particles.min.js",
@@ -116,9 +115,6 @@
             "tsConfig": "src/tsconfig.spec.json",
             "karmaConfig": "src/karma.conf.js",
             "scripts": [],
-            "styles": [
-              "src/styles.scss"
-            ],
             "assets": [
               "src/assets"
             ],

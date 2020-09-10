@@ -211,7 +211,6 @@ window.gb = function (file, canvas, options) {
 
 
 	function keyDownHandler(evt) {
-		console.log('dd ', evt.keyCode);
 		keysArray[evt.keyCode] = 0;
 
 		var stateNum = controlKeyConfig.STATES.indexOf(evt.keyCode)
@@ -228,8 +227,6 @@ window.gb = function (file, canvas, options) {
 	}
 
 	function keyUpHandler(evt) {
-		console.log('dd 1', evt.keyCode);
-
 		keysArray[evt.keyCode] = 1;
 	}
 
@@ -259,26 +256,28 @@ window.gb = function (file, canvas, options) {
 		keyUpHandler({ keyCode: 32 })
 	});
 
-	function __triggerKeyboardEvent(el, keyCode, eCall)
-	{
+	function __triggerKeyboardEvent(el, keyCode, eCall) {
+		keysArray[keyCode] = 0;
 		var eventObj = document.createEventObject ?
 			document.createEventObject() : document.createEvent("Events");
-	  
-		if(eventObj.initEvent){
-		  eventObj.initEvent(eCall, true, true);
+
+		if (eventObj.initEvent) {
+			eventObj.initEvent(eCall, true, true);
 		}
-	  
+
 		eventObj.keyCode = keyCode;
 		eventObj.which = keyCode;
-		
-		el.dispatchEvent ? el.dispatchEvent(eventObj) : el.fireEvent("onkeydown", eventObj); 
-	  
-	} 
-	
-	
+
+		el.dispatchEvent ?
+			el.dispatchEvent(eventObj) :
+			el.fireEvent(eCall, eventObj);
+
+	}
+
+
 	document.querySelector("#bStart").addEventListener('click', (e) => {
-		__triggerKeyboardEvent(canvas, 13, "keydown");
-		__triggerKeyboardEventbody, 13, "keyup");
+		keysArray[13] = 1;
+		__triggerKeyboardEvent(canvas , 13, "keydown");
 	});
 
 	document.querySelector("#bA").addEventListener('click', () => {
