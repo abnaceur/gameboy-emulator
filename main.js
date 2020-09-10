@@ -18,7 +18,7 @@ function createWindow() {
         center: true,
         transparent: true,
         resizable: false,
-        icon: path.join(__dirname, 'assets/pikachu.png'),
+        icon: './assets/pikachu.png',
         webPreferences: {
             nodeIntegration: true,
             allowRunningInsecureContent: (serve) ? true : false,
