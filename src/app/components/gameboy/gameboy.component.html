@@ -32,12 +32,23 @@
 <div class="debugButton" [ngClass]="{'d-none': electronService.isFullScreen}">
     <button (click)="debug()" type="button" [ngClass]="{'btn-primary': DEBUG, 'btn-outline-info'  :!DEBUG }"
         class="btn btn-sm">DEBUG</button>
+    <input id="active-debug" type="checkbox" class="d-none" [checked]="DEBUG" />
 </div>
 
-<div class="deguber-section" [ngClass]="{'d-none': electronService.isFullScreen || !DEBUG}">
-    <input id="active-debug" type="checkbox" name="active-debug" value="{{DEBUG}}" />
-    <label style="color: white; font-size: 22px" for="active-debug">Debugger</label>
-    <br><br>
-    <hr>
-    <div style="color: white; font-size: 22px" id="debug"></div>
+<div class="debug-section container-fluid" [ngClass]="{'d-none': electronService.isFullScreen || !DEBUG}">
+    <div class="row">
+        <div class="col-12">REGISTERS : <div id="debug"></div>
+        </div>
+        <div class="col-12 mt-2">CPU CMD : <div id="debug"></div>
+        </div>
+        <div class="col-12" id='debug-Cmd'>
+            <div class="input-group mb-3">
+                <input type="text" class="form-control" placeholder="Cmd here..." aria-label="Cmd here..."
+                    aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon2">Send</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
