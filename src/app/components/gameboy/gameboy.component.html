@@ -1,5 +1,5 @@
 <div class="backgd"></div>
-<img class="gbImage" [ngClass]="{'d-none': electronService.isFullScreen}" src="../../../assets/gameboy.png" alt="">
+<img class="gbImage" [ngClass]="{'d-none': electronService.isFullScreen}" src="./assets/gameboy.png" alt="">
 <canvas (dblclick)='fullScreen()' [ngClass]="{'fullScreen': electronService.isFullScreen, 
     'w-100': electronService.isFullScreen,
 'screenCanvas' : !electronService.isFullScreen}" id="gameboy"></canvas>
@@ -37,6 +37,8 @@
 
 <div class="debug-section container-fluid" [ngClass]="{'d-none': electronService.isFullScreen || !DEBUG}">
     <div class="row">
+        <div class="col-12">SCREEN -> FRAME PER SEC : <div id="frameScreen"></div>
+        </div>
         <div class="col-12">REGISTERS : <div id="debug"></div>
         </div>
         <div class="col-12 mt-2">CPU CMD : <div id="debug"></div>

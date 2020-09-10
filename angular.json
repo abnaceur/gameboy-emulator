@@ -24,8 +24,8 @@
               "src/styles.scss"
             ],
             "scripts": [
-              "assets/js/particles.min.js",
-              "assets/js/gb.js"
+              "./src/assets/js/particles.min.js",
+              "./src/assets/js/gb.js"
             ],
             "customWebpackConfig": {
               "path": "./angular.webpack.js"
