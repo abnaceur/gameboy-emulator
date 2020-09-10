@@ -3,37 +3,12 @@ window.onerror = function myErrorHandler(errorMsg, url, lineNumber) {
 }
 
 window.GBMasterClass = function () {
-
-	var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-		window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-	window.requestAnimationFrame = requestAnimationFrame;
-
 	this.gameboys = [];
-
 	var gameboys = this.gameboys;
 
 	function update() {
-		if (gameboys.length > 1) multiGBUpdate();
-		else if (gameboys.length == 1) gameboys[0].audioSyncUpdate();
+		if (gameboys.length == 1) gameboys[0].audioSyncUpdate();
 		window.requestAnimationFrame(update);
-	}
-
-	function multiGBUpdate() {
-		var gbl = gameboys.length
-
-		for (var gbn = 0; gbn < gbl; gbn++) {
-			if (!(gameboys[gbn].options.cButByte)) gameboys[gbn].prepareButtonByte();
-		}
-		var mostCycles = 0;
-		while (mostCycles < 70224) {
-			for (var gbn = 0; gbn < gbl; gbn++) {
-				while (gameboys[gbn].frameCycles <= Math.min(mostCycles, 70223)) gameboys[gbn].cycle();
-				mostCycles = gameboys[gbn].frameCycles
-			}
-		}
-		for (var gbn = 0; gbn < gbl; gbn++) {
-			gameboys[gbn].frameCycles -= 70224;
-		}
 	}
 
 	window.requestAnimationFrame(update);
