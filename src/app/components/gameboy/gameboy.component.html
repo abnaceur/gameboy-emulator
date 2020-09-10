@@ -22,10 +22,10 @@
 <div class="saveLoadGroup" [ngClass]="{'d-none': electronService.isFullScreen}">
     <div class="w-100 btn-group btn-group-toggle" data-toggle="buttons">
         <label class="btn btn-secondary active">
-            <input type="radio" name="options" id="btn-saveState" autocomplete="off" checked>Save
+            <button id="btn-saveState">Save</button>
         </label>
         <label class="btn btn-secondary">
-            <input type="radio" name="options" id="btn-loadState" autocomplete="off">Load
+            <button id="btn-loadState">Load</button>
         </label>
     </div>
 </div>
