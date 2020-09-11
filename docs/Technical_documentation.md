@@ -48,7 +48,23 @@ To setup this loop of execution, we have to seperate different functionnalities 
 
 ### Memory
 
+The CPU previously describe needs to fetch instructions from the memory. Like a computer, the gameboy memory is not just one block locations. The CPU can access 65,536 locations and differents part of this address bus can be drawn to see where it has access:
+
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Memory_Diagram.png)
+
+  - BIOS: 256 bytes Gameboy Bios code. Once it has run, it's removed from the memory map and this area of the cartridge rom is accessable.
+  - ROM (Read-Only Memory: 32k bytes): Cartridge ROM always available
+  - Video or Graphic RAM (Random Access Memory: 8k bytes): Necessary data for the backgrounds and sprites accessible for the Graphic system. The cartridge can change these data
+  - External RAM (Random Access Memory: 8k bytes): If needed, an additionnal RAM can be used here.
+  - Working RAM (Random Access Memory: 8k bytes): Intern to the gameboy, Readable and writable by the CPU
+  - Others:
+    - Graphics (OAM): sprite information: sprites position and attributes
+    - Memory Map I/O (IO Ports): controls values for the subsytem like sound. Available directly for the CPU.
+    - Zero-Page RAM (128 bytes): 
+
+To emulate the memory, we use arrays. The real emulation happens in the MMU (Memory Management Unit) which is a memory interface and manage the mapping:
+
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Emulate_Mem_Diagram.png)
 
 ## Sources
 

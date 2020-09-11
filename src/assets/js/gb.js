@@ -637,7 +637,7 @@ window.gb = function (file, canvas, options) {
 	}
 
 
-	IOWriteFunctions[0x55] = function (a, b) { //VRAM DMA
+	IOWriteFunctions[0x55] = function (a, b) { //VRAM DMA (Direct Memory Access)
 		if (CGB) {
 			if (CGBDMA.active && CGBDMA.mode && (!(a & 0x80))) {
 				CGBDMA.active = false;
