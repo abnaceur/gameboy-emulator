@@ -66,8 +66,18 @@ To emulate the memory, we use arrays. The real emulation happens in the MMU (Mem
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Emulate_Mem_Diagram.png)
 
+### Interface
+
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/homepage.JPG)
+
+
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Capturegbc.JPG)
+
+
+
 ## Sources
 
 	- https://www.lifewire.com/what-is-an-emulator-4687005
-	- 
+	- https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html 
+  - http://bgb.bircd.org/pandocs.htm#cpuregistersandflags
 	
