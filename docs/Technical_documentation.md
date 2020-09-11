@@ -46,7 +46,9 @@ To setup this loop of execution, we have to seperate different functionnalities 
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/CPU_Detail_Diagram.png)
 
+### Memory
 
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Memory_Diagram.png)
 
 ## Sources
 
