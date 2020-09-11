@@ -70,6 +70,7 @@ To emulate the memory, we use arrays. The real emulation happens in the MMU (Mem
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/homepage.JPG)
 
+--------------------------------------------------------------------------------------------------
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Capturegbc.JPG)
 
