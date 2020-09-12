@@ -21,15 +21,17 @@ window.gb = function (file, canvas, options) {
 	var loadStateBtn = document.querySelector("#btn-loadState");
 	var gbInstruction = document.querySelector("#basic-addon2");
 	var gbInstrucValue = document.querySelector("#gb-input");
-	
+
 	gbInstruction.addEventListener('click', () => {
 		console.log(gbInstrucValue.value);
+		registers[0] = gbInstrucValue.value;
 	});
 
 	var isDefaultLoaded = false;
 	if (options == null) {
 		var options = { rootDir: "" }
 	}
+
 	this.options = options;
 
 	if (typeof window.GBMaster == "undefined") window.GBMaster = new window.GBMasterClass();
@@ -282,7 +284,7 @@ window.gb = function (file, canvas, options) {
 
 	document.querySelector("#bStart").addEventListener('click', (e) => {
 		keysArray[13] = 1;
-		__triggerKeyboardEvent(canvas , 13, "keydown");
+		__triggerKeyboardEvent(canvas, 13, "keydown");
 	});
 
 	document.querySelector("#bA").addEventListener('click', () => {
@@ -2098,7 +2100,8 @@ window.gb = function (file, canvas, options) {
 			if ((divCounts & 15) == 0) IORAM[0x04] = (IORAM[0x04] + 1) & 0xFF; //"hey rhys why don't you just do IORAM[0x04]++ ???" i can't because apple decided to break the basic functionality of typed arrays like utter twats
 			if ((IORAM[0x07] & 4) && ((divCounts & timerMods[IORAM[0x07] & 3]) == 0)) {
 				IORAM[0x05] = (IORAM[0x05] + 1) & 0xFF;
-				// document.getElementById("debug").innerHTML = IORAM[0x05];
+				if (instCount % 25000 == 0)
+					document.getElementById("debuger").innerHTML = IORAM[0x05];
 				if (IORAM[0x05] == 0) {
 					IORAM[0x05] = IORAM[0x06];
 					IORAM[0x0F] |= 0x4
@@ -2243,6 +2246,8 @@ window.gb = function (file, canvas, options) {
 
 	function MemRead(pointer) {
 		Cycles += 4;
+		// console.log("pointer ", pointer)
+		// return pointer;
 		if ((pointer < 0x100) && biosActive) {
 			if (CGB) return CGBbios[pointer];
 			else return bios[pointer];

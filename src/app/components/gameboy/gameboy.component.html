@@ -37,11 +37,13 @@
 
 <div class="debug-section container-fluid" [ngClass]="{'d-none': electronService.isFullScreen || !DEBUG}">
     <div class="row">
-        <div class="col-12">SCREEN -> FRAME PER SEC : <div id="frameScreen"></div>
+        <div class="col-12"><b>SCREEN -> FRAME PER SEC :</b> <div id="frameScreen"></div>
         </div>
-        <div class="col-12">REGISTERS : <div id="debug"></div>
+        <div class="col-12"><b>REGISTERS :</b> <div id="debug"></div>
         </div>
-        <div class="col-12 mt-2">CPU CMD : <div id="debug"></div>
+        <div class="col-12"><b>IORAM :</b> <div id="debuger"></div>
+        </div>
+        <div class="col-12 mt-2"><b>CPU CMD :</b> <div id="debug"></div>
         </div>
         <div class="col-12" id='debug-Cmd'>
             <div class="input-group mb-3">
