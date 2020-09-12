@@ -24,7 +24,8 @@ window.gb = function (file, canvas, options) {
 
 	gbInstruction.addEventListener('click', () => {
 		console.log(gbInstrucValue.value);
-		registers[0] = gbInstrucValue.value;
+		Instructions[MemRead(parseInt(gbInstrucValue.value))]();
+		PC &= 0xFFFF;
 	});
 
 	var isDefaultLoaded = false;
@@ -240,61 +241,42 @@ window.gb = function (file, canvas, options) {
 
 	document.querySelector("#arrowT").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 38 });
-		keyUpHandler({ keyCode: 38 })
+		setTimeout(() => { keyUpHandler({ keyCode: 38 }) }, 200);
 	});
 
 	document.querySelector("#arrowB").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 40 });
-		keyUpHandler({ keyCode: 40 })
+		setTimeout(() => { keyUpHandler({ keyCode: 40 }) }, 200);
 	});
 
 	document.querySelector("#arrowR").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 39 });
-		keyUpHandler({ keyCode: 39 })
+		setTimeout(() => { keyUpHandler({ keyCode: 39 }) }, 200);
 	});
 
 	document.querySelector("#arrowL").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 37 });
-		keyUpHandler({ keyCode: 37 })
+		setTimeout(() => { keyUpHandler({ keyCode: 37 }) }, 200);
 	});
 
 	document.querySelector("#bSelect").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 32 });
-		keyUpHandler({ keyCode: 32 })
+		setTimeout(() => { keyUpHandler({ keyCode: 32 }) }, 200);
 	});
 
-	function __triggerKeyboardEvent(el, keyCode, eCall) {
-		keysArray[keyCode] = 0;
-		var eventObj = document.createEventObject ?
-			document.createEventObject() : document.createEvent("Events");
-
-		if (eventObj.initEvent) {
-			eventObj.initEvent(eCall, true, true);
-		}
-
-		eventObj.keyCode = keyCode;
-		eventObj.which = keyCode;
-
-		el.dispatchEvent ?
-			el.dispatchEvent(eventObj) :
-			el.fireEvent(eCall, eventObj);
-
-	}
-
-
 	document.querySelector("#bStart").addEventListener('click', (e) => {
-		keysArray[13] = 1;
-		__triggerKeyboardEvent(canvas, 13, "keydown");
+		keyDownHandler({ keyCode: 13 });
+		setTimeout(() => { keyUpHandler({ keyCode: 13 }) }, 200);
 	});
 
 	document.querySelector("#bA").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 88 });
-		keyUpHandler({ keyCode: 88 })
+		setTimeout(() => { keyUpHandler({ keyCode: 88 }) }, 200);
 	});
 
 	document.querySelector("#bB").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 90 });
-		keyUpHandler({ keyCode: 90 })
+		setTimeout(() => { keyUpHandler({ keyCode: 90 }) }, 200);
 	});
 
 
@@ -586,8 +568,7 @@ window.gb = function (file, canvas, options) {
 	}
 
 	IOWriteFunctions[0x44] = function (a, b) {
-		console.log("writing to LCDY??? what are you even doing")
-		//IORAM[b] = 0;
+		alert("writing to LCDY??? what are you even doing")
 	}
 
 	IOWriteFunctions[0x45] = function (a, b) {
@@ -2296,7 +2277,7 @@ window.gb = function (file, canvas, options) {
 			} else RAM[pointer - 0xC000] = value;
 		} else if (pointer < 0xFE00) {
 			console.log("writing to shadow ram?")
-			debugger;
+			// debugger;
 			if (CGB) {
 				if (pointer < 0xF000) RAM[pointer - 0xE000] = value;
 				else RAM[(pointer - 0xF000) + 0x1000 * IORAM[0x70]] = value;
