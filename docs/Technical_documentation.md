@@ -31,6 +31,17 @@ To be able to emulate a Gameboy, we have to understand The Gameboy computer like
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Architecture_Overview_GB_Diagram.png)
 
+### Interface
+
+To emulate the Gameboy on a computer, we choose to make a web Application full Javascript. For the interface, we are using Angular, timescript and Electron.
+
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/homepage.JPG)
+
+--------------------------------------------------------------------------------------------------
+
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Capturegbc.JPG)
+
+
 ### CPU (Central Processing Unit)
 
 The CPU in the Gameboy, like in a computer, is a processing Unit. In our case, it is single cycled which means that when the Gameboy starts or in ou case the program boot, it enters a single loop of operations:
@@ -66,15 +77,18 @@ To emulate the memory, we use arrays. The real emulation happens in the MMU (Mem
 
   ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Emulate_Mem_Diagram.png)
 
-### Interface
+### Graphics
 
-  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/homepage.JPG)
+The Gameboy is limited to how much it can store in graphics. It can't use a classic frame buffer so it use a tiling system:
+the game is allowed to build 8 pixel  by 8 pixel tiles and  place at a certain index each tile on the screen. 
 
---------------------------------------------------------------------------------------------------
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Tiles.JPG)
 
-  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Capturegbc.JPG)
+In addition to the background, we have more element to print: sprites. Sprites are two dimensionals graphics that our integrated into a larger screen in our case the background. Sprites represents characters ou gameobject. A good example is a Goomba in Mario.
 
+  ![alt text](https://github.com/abnaceur/abnaceur.github.io/blob/master/docs/img/Sprites.JPG)
 
+In the emulation, the graphic aspect is manage by all the functions in the GPU emulation part. The function drawSprite manage the sprites integration to the background.
 
 ## Sources
 
