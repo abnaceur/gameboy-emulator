@@ -2030,7 +2030,14 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
+	let fps = 0;
+	window.setInterval(function () {
+		document.getElementById("frameScreen").innerHTML = fps.toString();
+		fps = 0
+	}, 1000);
+
 	function drawFrame() {
+		fps += 1;
 		if (!frameskip) {
 			internalCtx.putImageData(GBScreen, 0, 0);
 			ctx.drawImage(internalCanvas, 0, 0, canvas.width, canvas.height);
