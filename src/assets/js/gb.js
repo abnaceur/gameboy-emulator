@@ -19,7 +19,12 @@ window.gb = function (file, canvas, options) {
 	var activeDebuger = document.querySelector("#active-debug");
 	var saveStateBtn = document.querySelector("#btn-saveState");
 	var loadStateBtn = document.querySelector("#btn-loadState");
-
+	var gbInstruction = document.querySelector("#basic-addon2");
+	var gbInstrucValue = document.querySelector("#gb-input");
+	
+	gbInstruction.addEventListener('click', () => {
+		console.log(gbInstrucValue.value);
+	});
 
 	var isDefaultLoaded = false;
 	if (options == null) {
