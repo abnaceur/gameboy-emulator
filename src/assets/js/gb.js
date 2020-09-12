@@ -233,61 +233,42 @@ window.gb = function (file, canvas, options) {
 
 	document.querySelector("#arrowT").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 38 });
-		keyUpHandler({ keyCode: 38 })
+		setTimeout(() => { keyUpHandler({ keyCode: 38 }) }, 200);
 	});
 
 	document.querySelector("#arrowB").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 40 });
-		keyUpHandler({ keyCode: 40 })
+		setTimeout(() => { keyUpHandler({ keyCode: 40 }) }, 200);
 	});
 
 	document.querySelector("#arrowR").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 39 });
-		keyUpHandler({ keyCode: 39 })
+		setTimeout(() => { keyUpHandler({ keyCode: 39 }) }, 200);
 	});
 
 	document.querySelector("#arrowL").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 37 });
-		keyUpHandler({ keyCode: 37 })
+		setTimeout(() => { keyUpHandler({ keyCode: 37 }) }, 200);
 	});
 
 	document.querySelector("#bSelect").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 32 });
-		keyUpHandler({ keyCode: 32 })
+		setTimeout(() => { keyUpHandler({ keyCode: 32 }) }, 200);
 	});
 
-	function __triggerKeyboardEvent(el, keyCode, eCall) {
-		keysArray[keyCode] = 0;
-		var eventObj = document.createEventObject ?
-			document.createEventObject() : document.createEvent("Events");
-
-		if (eventObj.initEvent) {
-			eventObj.initEvent(eCall, true, true);
-		}
-
-		eventObj.keyCode = keyCode;
-		eventObj.which = keyCode;
-
-		el.dispatchEvent ?
-			el.dispatchEvent(eventObj) :
-			el.fireEvent(eCall, eventObj);
-
-	}
-
-
 	document.querySelector("#bStart").addEventListener('click', (e) => {
-		keysArray[13] = 1;
-		__triggerKeyboardEvent(canvas , 13, "keydown");
+		keyDownHandler({ keyCode: 13 });
+		setTimeout(() => { keyUpHandler({ keyCode: 13 }) }, 200);
 	});
 
 	document.querySelector("#bA").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 88 });
-		keyUpHandler({ keyCode: 88 })
+		setTimeout(() => { keyUpHandler({ keyCode: 88 }) }, 200);
 	});
 
 	document.querySelector("#bB").addEventListener('click', () => {
 		keyDownHandler({ keyCode: 90 });
-		keyUpHandler({ keyCode: 90 })
+		setTimeout(() => { keyUpHandler({ keyCode: 90 }) }, 200);
 	});
 
 
