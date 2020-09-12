@@ -37,13 +37,20 @@
 
 <div class="debug-section container-fluid" [ngClass]="{'d-none': electronService.isFullScreen || !DEBUG}">
     <div class="row">
-        <div class="col-12"><b>SCREEN -> FRAME PER SEC :</b> <div id="frameScreen"></div>
+        <div class="col-12"><b>SCREEN -> FRAME PER SEC :</b>
+            <div id="frameScreen"></div>
         </div>
-        <div class="col-12"><b>REGISTERS :</b> <div id="debug"></div>
+        <div class="col-12"><b>REGISTERS :</b>
+            <div id="debug"></div>
         </div>
-        <div class="col-12"><b>IORAM :</b> <div id="debuger"></div>
+        <div class="col-12"><b>IORAM :</b>
+            <div id="debuger"></div>
         </div>
-        <div class="col-12 mt-2"><b>CPU CMD :</b> <div id="debug"></div>
+        <div class="col-12 mt-2"><b>Pointer :</b>
+            <div id="breakpoint"></div>
+        </div>
+        <div class="col-12 mt-2"><b>CPU CMD :</b>
+            <div id="debug"></div>
         </div>
         <div class="col-12" id='debug-Cmd'>
             <div class="input-group mb-3">
@@ -51,6 +58,13 @@
                     aria-describedby="basic-addon2">
                 <div class="input-group-append">
                     <span class="input-group-text" id="basic-addon2">Send</span>
+                </div>
+            </div>
+            <div class="input-group mb-3">
+                <input id="breakpoint-dt" type="text" class="form-control" placeholder="Break point..."
+                    aria-label="Break point..." aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <span class="input-group-text" id="basic-addon1">Set it</span>
                 </div>
             </div>
         </div>

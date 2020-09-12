@@ -19,13 +19,22 @@ window.gb = function (file, canvas, options) {
 	var activeDebuger = document.querySelector("#active-debug");
 	var saveStateBtn = document.querySelector("#btn-saveState");
 	var loadStateBtn = document.querySelector("#btn-loadState");
+
+	// Handle instructions
 	var gbInstruction = document.querySelector("#basic-addon2");
 	var gbInstrucValue = document.querySelector("#gb-input");
 
 	gbInstruction.addEventListener('click', () => {
-		console.log(gbInstrucValue.value);
 		Instructions[MemRead(parseInt(gbInstrucValue.value))]();
-		PC &= 0xFFFF;
+	});
+
+	// Handle breakpoints
+	var breakPointBtn = document.querySelector("#basic-addon1");
+	var breakpointValue = document.querySelector("#breakpoint-dt");
+	var breakPoint = null;
+
+	breakPointBtn.addEventListener('click', () => {
+		breakPoint = parseInt(breakpointValue.value);
 	});
 
 	var isDefaultLoaded = false;
@@ -2160,10 +2169,8 @@ window.gb = function (file, canvas, options) {
 
 		var mask = IORAM[0x0F] & ZRAM[0x7F]
 		if (halted && mask) { //if we can stop the halt now, do it
-			//console.log("halt time: "+(masterClock-haltTimerino))
 			halted = false;
 		} else if (halted) {
-			//console.log("skipped "+);
 			haltSkip();
 			mask = IORAM[0x0F] & ZRAM[0x7F];
 		}
@@ -2186,8 +2193,7 @@ window.gb = function (file, canvas, options) {
 				IORAM[0x0F] &= 0xF
 				RST(0x60);
 			}
-			//Cycles = 20; //2 cycles wait, 2 cycles push pc, one cycle set PC -- nvm breaks everything??
-		}//else {
+		}
 		Cycles = 0;
 		if (halted) Cycles += 0;
 		else if (CGBDMA.active && (!(CGBDMA.mode))) {
@@ -2225,10 +2231,19 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
+	let tmpDeley = 0;
 	function MemRead(pointer) {
+		tmpDeley++;
+		if ((!biosActive) && (tmpDeley % 80000 == 0) && activeDebuger.checked)
+			document.getElementById("breakpoint").innerHTML = pointer;
+
+
+		if (breakPoint == pointer) {
+			console.log("Breakpoint at", pointer);
+			debugger;
+		}
+
 		Cycles += 4;
-		// console.log("pointer ", pointer)
-		// return pointer;
 		if ((pointer < 0x100) && biosActive) {
 			if (CGB) return CGBbios[pointer];
 			else return bios[pointer];
