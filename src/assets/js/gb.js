@@ -2246,8 +2246,12 @@ window.gb = function (file, canvas, options) {
 
 
 		if (breakPoint == pointer) {
-			console.log("Breakpoint at", pointer);
-			debugger;
+			document.getElementById("breakpoint").innerHTML = breakPoint;
+			setTimeout(() => {
+				if (breakPoint !== null)
+					alert(breakPoint);
+				breakPoint = null
+			}, 10)
 		}
 
 		Cycles += 4;
