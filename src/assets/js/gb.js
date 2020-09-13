@@ -1622,32 +1622,40 @@ window.gb = function (file, canvas, options) {
 	// ----- CARTRIDGE HARDWARE (MBC etc) EMULATION -----
 
 	var MBCTable = [
-		{ type: 0, hardware: [] },
-		{ type: 1, hardware: [], RAMBankMode: false },
-		{ type: 1, hardware: ["RAM"], RAMBankMode: false },
-		{ type: 1, hardware: ["RAM", ""], RAMBankMode: false },
+		{type: 0, hardware: []},
+		{type: 1, hardware: [], RAMBankMode:false},
+		{type: 1, hardware: ["RAM"], RAMBankMode:false},
+		{type: 1, hardware: ["RAM", "BATTERY"], RAMBankMode:false},
 		null,
-		{ type: 2, hardware: [], RAMBankMode: false },
-		{ type: 2, hardware: ["RAM"], RAMBankMode: false },
-		{ type: 2, hardware: ["RAM", ""], RAMBankMode: false },
+		{type: 2, hardware: []},
+		{type: 2, hardware: ["BATTERY"]},
 		null,
-		{ type: 0, hardware: ["RAM"] },
-		{ type: 0, hardware: ["RAM", ""] },
+		{type: 0, hardware: ["RAM"]},
+		{type: 0, hardware: ["RAM", "BATTERY"]},
 		null,
-		{ type: 3, hardware: ["TIMER", ""] },
-		{ type: 3, hardware: ["TIMER", "RAM", ""] },
-		{ type: 3, hardware: [] },
-		{ type: 3, hardware: ["RAM"] },
-		{ type: 3, hardware: ["RAM", ""] },
+		{type: 6, hardware: []},//MMM01
+		{type: 6, hardware: ["RAM"]}, 
+		{type: 6, hardware: ["RAM", "BATTERY"]}, 
 		null,
-		{ type: 5, hardware: [] },
-		{ type: 5, hardware: ["RAM"] },
-		{ type: 5, hardware: ["RAM", ""] },
-		{ type: 5, hardware: ["RUMBLE"] },
-		{ type: 5, hardware: ["RUMBLE", "RAM"] },
-		{ type: 5, hardware: ["RUMBLE", "RAM", ""] },
+		{type: 3, hardware: ["TIMER", "BATTERY"]}, 
+		{type: 3, hardware: ["TIMER", "RAM", "BATTERY"]}, 
+		{type: 3, hardware: []}, 
+		{type: 3, hardware: ["RAM"]},
+		{type: 3, hardware: ["RAM", "BATTERY"]},
+		null,
+		{type: 4, hardware: []}, 
+		{type: 4, hardware: ["RAM"]}, 
+		{type: 4, hardware: ["RAM", "BATTERY"]},
+		null,
+		{type: 5, hardware: []}, 
+		{type: 5, hardware: ["RAM"]}, 
+		{type: 5, hardware: ["RAM", "BATTERY"]}, 
+		{type: 5, hardware: ["RUMBLE"]}, 
+		{type: 5, hardware: ["RUMBLE", "RAM"]}, 
+		{type: 5, hardware: ["RUMBLE", "RAM", "BATTERY"]},  
 	]
 
+	
 	var MBCWriteHandlers = []
 	var MBCReadHandlers = []
 
@@ -1799,6 +1807,32 @@ window.gb = function (file, canvas, options) {
 			return CRAM[a - 0xA000 + MBC.RAMbank * 0x2000];
 		} else {
 			return game[a];
+		}
+	}
+
+	//special MBC for GBS files (start at offset)
+
+	MBCWriteHandlers[6] = function(w, v){
+		if ((w < 0x4000) && (w >= 0x2000)) {
+			MBC.ROMbank = v;
+		} else if ((w < 0xC000) && (w >= 0xA000)) {
+			CRAM[w-0xA000] = v;
+		}
+	}
+
+	MBCReadHandlers[6] = function(a) {
+		if (a < 0x4000) {
+			if (a-MBC.offset < 0) {
+				return MBC.lowData[a] | 0;
+			} else {
+				return game[(a-MBC.offset)+0x70];
+			}
+		} else if (a < 0x8000) {
+			return game[((a-0x4000)+MBC.ROMbank*0x4000-MBC.offset)+0x70];
+		} else if ((a < 0xC000) && (a >= 0xA000)) {
+			return CRAM[a-0xA000];
+		} else {
+			return 0;
 		}
 	}
 
