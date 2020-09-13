@@ -53,7 +53,7 @@ window.gb = function (file, canvas, options) {
 	this.paused = false;
 	this.loadState = loadState;
 	this.saveState = saveState;
-
+	window.addEventListener("unload", saveBattery)
 	var GBObj = this;
 
 	this.loadROM = function (url, pauseAfter) {
@@ -76,12 +76,17 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	this.loadROMBuffer = function (buffer) {
+	this.loadROMBuffer = function (buffer, battery) {
 		if (buffer instanceof ArrayBuffer) game = new Uint8Array(buffer);
 		else if (buffer instanceof Uint8Array) game = buffer;
 		else alert(buffer);
 		GBObj.game = game;
 		gameLoaded = true;
+		if (battery) {
+			ROMID = generateUniqueName();
+			CRAM = new Uint8Array(battery);
+			saveBattery();
+		}
 		if (biosLoaded == 2) init();
 	}
 
@@ -1622,40 +1627,40 @@ window.gb = function (file, canvas, options) {
 	// ----- CARTRIDGE HARDWARE (MBC etc) EMULATION -----
 
 	var MBCTable = [
-		{type: 0, hardware: []},
-		{type: 1, hardware: [], RAMBankMode:false},
-		{type: 1, hardware: ["RAM"], RAMBankMode:false},
-		{type: 1, hardware: ["RAM", "BATTERY"], RAMBankMode:false},
+		{ type: 0, hardware: [] },
+		{ type: 1, hardware: [], RAMBankMode: false },
+		{ type: 1, hardware: ["RAM"], RAMBankMode: false },
+		{ type: 1, hardware: ["RAM", "BATTERY"], RAMBankMode: false },
 		null,
-		{type: 2, hardware: []},
-		{type: 2, hardware: ["BATTERY"]},
+		{ type: 2, hardware: [] },
+		{ type: 2, hardware: ["BATTERY"] },
 		null,
-		{type: 0, hardware: ["RAM"]},
-		{type: 0, hardware: ["RAM", "BATTERY"]},
+		{ type: 0, hardware: ["RAM"] },
+		{ type: 0, hardware: ["RAM", "BATTERY"] },
 		null,
-		{type: 6, hardware: []},//MMM01
-		{type: 6, hardware: ["RAM"]}, 
-		{type: 6, hardware: ["RAM", "BATTERY"]}, 
+		{ type: 6, hardware: [] },//MMM01
+		{ type: 6, hardware: ["RAM"] },
+		{ type: 6, hardware: ["RAM", "BATTERY"] },
 		null,
-		{type: 3, hardware: ["TIMER", "BATTERY"]}, 
-		{type: 3, hardware: ["TIMER", "RAM", "BATTERY"]}, 
-		{type: 3, hardware: []}, 
-		{type: 3, hardware: ["RAM"]},
-		{type: 3, hardware: ["RAM", "BATTERY"]},
+		{ type: 3, hardware: ["TIMER", "BATTERY"] },
+		{ type: 3, hardware: ["TIMER", "RAM", "BATTERY"] },
+		{ type: 3, hardware: [] },
+		{ type: 3, hardware: ["RAM"] },
+		{ type: 3, hardware: ["RAM", "BATTERY"] },
 		null,
-		{type: 4, hardware: []}, 
-		{type: 4, hardware: ["RAM"]}, 
-		{type: 4, hardware: ["RAM", "BATTERY"]},
+		{ type: 4, hardware: [] },
+		{ type: 4, hardware: ["RAM"] },
+		{ type: 4, hardware: ["RAM", "BATTERY"] },
 		null,
-		{type: 5, hardware: []}, 
-		{type: 5, hardware: ["RAM"]}, 
-		{type: 5, hardware: ["RAM", "BATTERY"]}, 
-		{type: 5, hardware: ["RUMBLE"]}, 
-		{type: 5, hardware: ["RUMBLE", "RAM"]}, 
-		{type: 5, hardware: ["RUMBLE", "RAM", "BATTERY"]},  
+		{ type: 5, hardware: [] },
+		{ type: 5, hardware: ["RAM"] },
+		{ type: 5, hardware: ["RAM", "BATTERY"] },
+		{ type: 5, hardware: ["RUMBLE"] },
+		{ type: 5, hardware: ["RUMBLE", "RAM"] },
+		{ type: 5, hardware: ["RUMBLE", "RAM", "BATTERY"] },
 	]
 
-	
+
 	var MBCWriteHandlers = []
 	var MBCReadHandlers = []
 
@@ -1812,28 +1817,51 @@ window.gb = function (file, canvas, options) {
 
 	//special MBC for GBS files (start at offset)
 
-	MBCWriteHandlers[6] = function(w, v){
+	MBCWriteHandlers[6] = function (w, v) {
 		if ((w < 0x4000) && (w >= 0x2000)) {
 			MBC.ROMbank = v;
 		} else if ((w < 0xC000) && (w >= 0xA000)) {
-			CRAM[w-0xA000] = v;
+			CRAM[w - 0xA000] = v;
 		}
 	}
 
-	MBCReadHandlers[6] = function(a) {
+	MBCReadHandlers[6] = function (a) {
 		if (a < 0x4000) {
-			if (a-MBC.offset < 0) {
+			if (a - MBC.offset < 0) {
 				return MBC.lowData[a] | 0;
 			} else {
-				return game[(a-MBC.offset)+0x70];
+				return game[(a - MBC.offset) + 0x70];
 			}
 		} else if (a < 0x8000) {
-			return game[((a-0x4000)+MBC.ROMbank*0x4000-MBC.offset)+0x70];
+			return game[((a - 0x4000) + MBC.ROMbank * 0x4000 - MBC.offset) + 0x70];
 		} else if ((a < 0xC000) && (a >= 0xA000)) {
-			return CRAM[a-0xA000];
+			return CRAM[a - 0xA000];
 		} else {
 			return 0;
 		}
+	}
+
+	// HandleinSave
+	function loadBattery() {
+		var battery = localStorage["battery/" + ROMID]
+		if (MBC.type == 5) CRAM = new Uint8Array(RAMsizesMBC5[Math.min(3, game[0x149])]);
+		else CRAM = new Uint8Array(RAMsizes[Math.min(3, game[0x149])]);
+		if (typeof battery != "undefined") {
+			for (var i = 0; i < battery.length; i++) {
+				CRAM[i] = battery.charCodeAt(i);
+			}
+		}
+	}
+
+	function saveBattery() {
+		console.log("===============")
+		if (!MBC) return;
+		if (MBC.hardware.indexOf("BATTERY") == -1) return;
+		var battery = "";
+		for (var i = 0; i < CRAM.length; i++) {
+			battery += String.fromCharCode(CRAM[i]);
+		}
+		localStorage["battery/" + ROMID] = battery;
 	}
 
 	// ----- CPU EMULATION -----
@@ -1881,8 +1909,11 @@ window.gb = function (file, canvas, options) {
 			MBC.RAMenable = false;
 			MBC.RAMbank = 0;
 			if (reloadValue) {
-				if (MBC.type == 5) CRAM = new Uint8Array(RAMsizesMBC5[Math.min(3, game[0x149])]);
-				else CRAM = new Uint8Array(RAMsizes[Math.min(3, game[0x149])]);
+				if (MBC.hardware.indexOf("BATTERY") > -1) loadBattery();
+				else {
+					if (MBC.type == 5) CRAM = new Uint8Array(RAMsizesMBC5[Math.min(3, game[0x149])]);
+					else CRAM = new Uint8Array(RAMsizes[Math.min(3, game[0x149])]);
+				}
 			}
 			if (MBC.hardware.indexOf("TIMER") > -1) {
 				MBC.RTC = {
