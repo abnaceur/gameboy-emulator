@@ -20,7 +20,6 @@ window.gb = function (file, canvas, options) {
 	var saveStateBtn = document.querySelector("#btn-saveState");
 	var loadStateBtn = document.querySelector("#btn-loadState");
 
-	// Handle instructions
 	var gbInstruction = document.querySelector("#basic-addon2");
 	var gbInstrucValue = document.querySelector("#gb-input");
 
@@ -28,7 +27,6 @@ window.gb = function (file, canvas, options) {
 		Instructions[MemRead(parseInt(gbInstrucValue.value))]();
 	});
 
-	// Handle breakpoints
 	var breakPointBtn = document.querySelector("#basic-addon1");
 	var breakpointValue = document.querySelector("#breakpoint-dt");
 	var breakPoint = null;
@@ -47,9 +45,8 @@ window.gb = function (file, canvas, options) {
 	if (typeof window.GBMaster == "undefined") window.GBMaster = new window.GBMasterClass();
 
 	var sadGB = "data:image/gif;base64,R0lGODlhGQArAIAAAP///wAAACH5BAAHAP8ALAAAAAAZACsAAAKORI6pewYPo5yvGYZRDTf721Gi1mjiRHKmKrFhaTkolIYOF7m1eeawTaugfjwarkWM9Taq5pGpfDlzSGMTeMLtor2tJwNSUI5i2BcD6pwTmyG4ulxy43D6iPy0xaj9iLuVdQSlFY4FrWXN1NnN9R493gY6Xg4JaSlKHdjqCfDl7X5CYqZqeck6IYKxUBRAAA7";
-	//image used for errors, takes up space but you've got to love it tho
 
-	this.RSToff = 0; //used by gbs player
+	this.RSToff = 0;
 	this.paused = false;
 	this.loadState = loadState;
 	this.saveState = saveState;
@@ -96,8 +93,8 @@ window.gb = function (file, canvas, options) {
 	this.internalCanvas = internalCanvas;
 	var internalCtx = internalCanvas.getContext("2d");
 
-	if (canvas == null) canvas = internalCanvas; //if we have no output, display to self.
-	this.canvas = canvas; //output canvas
+	if (canvas == null) canvas = internalCanvas;
+	this.canvas = canvas;
 	var ctx = canvas.getContext("2d");
 
 	if (typeof ctx.webkitImageSmoothingEnabled != "undefined") {
@@ -132,18 +129,13 @@ window.gb = function (file, canvas, options) {
 	}
 
 	var stereo = true;
-	//if (iOS) NoAudioAPI = true;
 
 	if (NoAudioAPI) {
-		//audio api is so integrated that i have to make all nodes dummy objects to keep things functioning
-		//since the AudioEngine objects are still used in audio emulation (which is still needed)
-		//please forgive me for this hacky disaster
-
 		GBAudioContext = {
 			createGain: function () { return { gain: { value: 0 }, connect: function () { } } },
 			createChannelMerger: function (a) { return { connect: function () { } } },
 			createScriptProcessor: function (a, b, c) { return { connect: function () { } } },
-			sampleRate: 0 //this will make cyclesForSample equal infinity, and no audio will ever be produced. ;)
+			sampleRate: 0
 		}
 	}
 
@@ -187,7 +179,7 @@ window.gb = function (file, canvas, options) {
 		RIGHT: 39
 	}
 
-	this.keyConfig = keyConfig; //allow public access
+	this.keyConfig = keyConfig;
 
 	var controlKeyConfig = {
 		STATES: [112, 113, 114, 115, 116, 117, 118, 119, 120, 121]
@@ -248,6 +240,7 @@ window.gb = function (file, canvas, options) {
 
 	}
 
+  // Keyboard Event handler
 	function keyUpHandler(evt) {
 		keysArray[evt.keyCode] = 1;
 	}
@@ -320,7 +313,7 @@ window.gb = function (file, canvas, options) {
 		return name + sum;
 	}
 
-	var Instructions = //cue ridiculously large table
+	var Instructions =
 		[
 			NOP, function () { LD16M(1) }, function () { LDMA(1) }, function () { INC16(1) }, function () { INC(1) }, function () { DEC(1) }, function () { LDM(1) }, function () { RLC(0); flags[0] = 0 }, LDSP, function () { ADDHL16(1) }, function () { LDAM(1) }, function () { DEC16(1) }, function () { INC(2) }, function () { DEC(2) }, function () { LDM(2) }, function () { RRC(0); flags[0] = 0 },
 			STOP, function () { LD16M(3) }, function () { LDMA(3) }, function () { INC16(3) }, function () { INC(3) }, function () { DEC(3) }, function () { LDM(3) }, function () { RL(0); flags[0] = 0 }, function () { JR(4, 1) }, function () { ADDHL16(3) }, function () { LDAM(3) }, function () { DEC16(3) }, function () { INC(4) }, function () { DEC(4) }, function () { LDM(4) }, function () { RR(0); flags[0] = 0 },
@@ -360,7 +353,10 @@ window.gb = function (file, canvas, options) {
 			function () { SET(6, 1) }, function () { SET(6, 2) }, function () { SET(6, 3) }, function () { SET(6, 4) }, function () { SET(6, 5) }, function () { SET(6, 6) }, function () { SETHL(6) }, function () { SET(6, 0) }, function () { SET(7, 1) }, function () { SET(7, 2) }, function () { SET(7, 3) }, function () { SET(7, 4) }, function () { SET(7, 5) }, function () { SET(7, 6) }, function () { SETHL(7) }, function () { SET(7, 0) },
 		]
 
-	// ----- State Load/Save -----
+	/**
+   *
+   * Save and Load emulation: Load option only possible if a save has be done
+   */
 
 	function byteToString(byteArray, noBase64) {
 		if (typeof byteArray == "undefined") return;
@@ -368,12 +364,12 @@ window.gb = function (file, canvas, options) {
 		for (var i = 0; i < byteArray.length; i++) {
 			string += String.fromCharCode(byteArray[i]);
 		}
-		return (noBase64 || false) ? string : btoa(string); //i have to base64 encode because JSON.stringify encodes unusual characters like \u1234
+		return (noBase64 || false) ? string : btoa(string);
 	}
 
 	function stringToByte(string, noBase64) {
 		var string = (noBase64 || false) ? string : atob(string);
-		if (typeof string == "undefined") return; //so incomplete states don't cause errors.
+		if (typeof string == "undefined") return;
 		var byteArray = new Uint8Array(string.length)
 		for (var i = 0; i < byteArray.length; i++) {
 			byteArray[i] = string.charCodeAt(i);
@@ -415,7 +411,6 @@ window.gb = function (file, canvas, options) {
 				timerCycles: timerCycles,
 				audioCycles: audioCycles,
 				divCounts: divCounts,
-				//timerCounts: timerCounts
 			},
 
 			AudioEngine: objectifyAudioEngine()
@@ -457,7 +452,6 @@ window.gb = function (file, canvas, options) {
 		timerCycles = obj.CycleTimers.timerCycles;
 		audioCycles = obj.CycleTimers.audioCycles;
 		divCounts = obj.CycleTimers.divCounts;
-		//timerCounts = obj.CycleTimers.timerCounts;
 
 		restoreAudioEngine(obj.AudioEngine);
 		audioSyncFrames = 0;
@@ -473,7 +467,6 @@ window.gb = function (file, canvas, options) {
 		for (var i = 0; i < 32; i++) {
 			var mult = 8.225806451612904;
 			dest.set([Math.round((reg[i * 2] & 0x1F) * mult), Math.round(((reg[i * 2] >> 5) + ((reg[i * 2 + 1] & 3) << 3)) * mult), Math.round(((reg[i * 2 + 1] & 0x7C) >> 2) * mult), 255], i * 4);
-			//dest[i] = [Math.round((reg[i*2]&0x1F)*mult), Math.round(((reg[i*2]>>5)+((reg[i*2+1]&3)<<3))*mult), Math.round(((reg[i*2+1]&0x7C)>>2)*mult)]
 		}
 	}
 
@@ -546,7 +539,10 @@ window.gb = function (file, canvas, options) {
 	}
 
 
-	// ----- I/O EMULATION -----
+	/**
+   * Input/Output emulation part
+   */
+
 	var IOReadFunctions = [];
 	var IOWriteFunctions = [];
 
@@ -555,7 +551,6 @@ window.gb = function (file, canvas, options) {
 	};
 
 	IOWriteFunctions[0x07] = function (a, b) {
-		//if ((a&4) ^ (IORAM[0x07]&4)) timerCounts = 0;
 		IORAM[b] = a;
 	};
 
@@ -600,8 +595,6 @@ window.gb = function (file, canvas, options) {
 		return (IORAM[a] & 0xFC) | (IORAM[0x40] & 0x80) ? LCDstate : 0;
 	}
 
-	//CGB IO
-
 	IOWriteFunctions[0x4D] = function (a, b) {
 		IORAM[b] = a;
 	};
@@ -611,7 +604,6 @@ window.gb = function (file, canvas, options) {
 		else return IORAM[a]
 	}
 
-	/* CGB DMA positions */
 	IOWriteFunctions[0x51] = function (a) {
 		CGBDMA.srcPos = ((a << 8) | (CGBDMA.srcPos & 0xFF)) & 0xFFF0
 	}
@@ -638,16 +630,17 @@ window.gb = function (file, canvas, options) {
 		return CGBDMA.destPos & 0xFF;
 	}
 
-
-	IOWriteFunctions[0x55] = function (a, b) { //VRAM DMA (Direct Memory Access)
+  /**
+   *
+   * Direct Memory Access of Video RAM
+   */
+	IOWriteFunctions[0x55] = function (a, b) {
 		if (CGB) {
 			if (CGBDMA.active && CGBDMA.mode && (!(a & 0x80))) {
 				CGBDMA.active = false;
 				return;
 			}
 			CGBDMA.active = true;
-			//CGBDMA.srcPos = (IORAM[0x52]+(IORAM[0x51]<<8))&0xFFF0
-			//CGBDMA.destPos = (IORAM[0x54]+(IORAM[0x53]<<8))&0x1FF0
 			CGBDMA.mode = a & 0x80;
 			CGBDMA.Tlength = ((a & 0x7F) + 1) << 4;
 			IORAM[b] = a;
@@ -723,8 +716,6 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	//END CGB IO
-
 	IOWriteFunctions[0x50] = function (a, b) {
 		biosActive = false;
 		IORAM[b] = a;
@@ -751,13 +742,12 @@ window.gb = function (file, canvas, options) {
 		} else {
 			if (CGB) return;
 		}
-		AudioEngine[0].lengthCtr = (64 - (a & 0x3F)); // can be written while off on DMG for whatever reason
+		AudioEngine[0].lengthCtr = (64 - (a & 0x3F));
 	}
 
 	IOWriteFunctions[0x12] = function (a, b) {
 		if (IORAM[0x26] & 0x80) {
 
-			//ZOMBIE MODE
 			var attr = IORAM[esweepPtrs[0]];
 			if (IORAM[0x26] & (1 << 0)) {
 				var period = attr & 7
@@ -765,7 +755,7 @@ window.gb = function (file, canvas, options) {
 			}
 
 			IORAM[b] = a;
-			if (!(a & 0xF8)) channelOff(0); //DAC Power Off
+			if (!(a & 0xF8)) channelOff(0);
 			soundPhase = 1;
 
 
@@ -810,7 +800,6 @@ window.gb = function (file, canvas, options) {
 	IOWriteFunctions[0x17] = function (a, b) {
 		if (IORAM[0x26] & 0x80) {
 
-			//ZOMBIE MODE
 			var attr = IORAM[esweepPtrs[1]];
 			if (IORAM[0x26] & (1 << 1)) {
 				var period = attr & 7
@@ -818,7 +807,7 @@ window.gb = function (file, canvas, options) {
 			}
 
 			IORAM[b] = a;
-			if (!(a & 0xF8)) channelOff(1); //DAC Power Off
+			if (!(a & 0xF8)) channelOff(1);
 		}
 	}
 
@@ -898,7 +887,6 @@ window.gb = function (file, canvas, options) {
 	IOWriteFunctions[0x21] = function (a, b) {
 		if (IORAM[0x26] & 0x80) {
 
-			//ZOMBIE MODE
 			var attr = IORAM[esweepPtrs[3]];
 			if (IORAM[0x26] & (1 << 3)) {
 				var period = attr & 7
@@ -906,7 +894,7 @@ window.gb = function (file, canvas, options) {
 			}
 
 			IORAM[b] = a;
-			if (!(a & 0xF8)) channelOff(3); //DAC Power Off
+			if (!(a & 0xF8)) channelOff(3);
 		}
 	}
 
@@ -945,13 +933,11 @@ window.gb = function (file, canvas, options) {
 				AudioEngine[i].lEnable = a & (1 << (i + 4))
 				AudioEngine[i].rEnable = a & (1 << i)
 			}
-			//soundMasterGain();
 		}
 	}
 
 	IOWriteFunctions[0x26] = function (a, b) {
 		if ((IORAM[0x26] & 0x80) && (!(a & 0x80))) {
-			//power off!!!
 			for (var i = 0; i < 4; i++) channelOff(i);
 			for (var i = 0x10; i < 0x26; i++) {
 				if ((lengthPtrs.indexOf(i) == -1) || CGB) IOWriteFunctions[i](0, i);
@@ -962,19 +948,10 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	// GEneral memory Map
-	// 	0000-3FFF   16KB ROM Bank 00     (in cartridge, fixed at bank 00)
-	//   4000-7FFF   16KB ROM Bank 01..NN (in cartridge, switchable bank number)
-	//   8000-9FFF   8KB Video RAM (VRAM) (switchable bank 0-1 in CGB Mode)
-	//   A000-BFFF   8KB External RAM     (in cartridge, switchable bank, if any)
-	//   C000-CFFF   4KB Work RAM Bank 0 (WRAM)
-	//   D000-DFFF   4KB Work RAM Bank 1 (WRAM)  (switchable bank 1-7 in CGB Mode)
-	//   E000-FDFF   Same as C000-DDFF (ECHO)    (typically not used)
-	//   FE00-FE9F   Sprite Attribute Table (OAM)
-	//   FEA0-FEFF   Not Usable
-	//   FF00-FF7F   I/O Ports
-	//   FF80-FFFE   High RAM (HRAM)
-	//   FFFF        Interrupt Enable Register
+  /**
+   *
+   * Memory Map (See memory part of technical_documentation for more information)
+   */
 	IOReadFunctions[0x10] = function (a) { return IORAM[a] | 0x80; }
 	IOReadFunctions[0x11] = function (a) { return IORAM[a] | 0x3F; }
 	IOReadFunctions[0x13] = function (a) { return IORAM[a] | 0xFF; }
@@ -1006,16 +983,15 @@ window.gb = function (file, canvas, options) {
 		palettes.set(readDMGPalette(2), 32);
 	}
 
-	function calculateCurrentWaveRam() { //uses last phase and the cycle that phase was on to determine the real Wave RAM Position
+	function calculateCurrentWaveRam() {
 		var temp = (AudioEngine[2].phase + AudioEngine[2].frequency * (audioSampleRate / 4194304) * (masterClock - WaveRAMCycles)) % 32
-		//console.log((masterClock-WaveRAMCycles)+ " " +(temp-AudioEngine[2].phase))
 		return Math.floor(temp / 2);
 	}
 
 	function WaveRAMRead(a) {
 		if (!(IORAM[0x26] & 4)) {
 			return IORAM[a]
-		} else if (true) { //DMG only, CGB is always accessable ---- masterClock-WaveRAMCycles <= 16 ---- currently disabled until accurate Wave RAM Read timings are achieved
+		} else if (true) {
 			return IORAM[0x30 + calculateCurrentWaveRam()]
 		} else {
 		}
@@ -1023,7 +999,7 @@ window.gb = function (file, canvas, options) {
 	function WaveRAMWrite(a, b) {
 		if (!(IORAM[0x26] & 4)) {
 			IORAM[b] = a;
-		} else if (true) { //DMG only, CGB is always accessable
+		} else if (true) {
 			console.log("illegal WRAM change!")
 			IORAM[0x30 + (Math.floor(AudioEngine[2].phase / 2))] = a
 		}
@@ -1050,18 +1026,13 @@ window.gb = function (file, canvas, options) {
 		var mempos = a << 8;
 		for (var i = 0; i < 0x9F; i++) {
 			OAM[i] = MemRead(mempos++);
-			/*if (i == 2) { 
-				console.log(OAM[2] + " " + (mempos-1));
-				console.log(MemRead(55042) + " why");
-				Cycles -= 4;
-			}*/
 			Cycles -= 4;
 		}
 	}
 
-	// ----- SOUND EMULATION -----
-
-	// ----- WEB AUDIO API BACKEND -----
+/**
+ * Sound
+ */
 
 	function bufferCopyNode(evt) {
 		var targ = evt.currentTarget;
@@ -1076,8 +1047,7 @@ window.gb = function (file, canvas, options) {
 		}
 		targ.bufferRead = (read + 1) % AudioEngine.buffers
 
-		//if (targ.bufferWrite == read) targ.bufferWrite = targ.bufferRead
-		if (!GBObj.paused) audioSyncFrames += (bufferSize / audioSampleRate) / (70224 / 4194304) //lots of bs values
+		if (!GBObj.paused) audioSyncFrames += (bufferSize / audioSampleRate) / (70224 / 4194304)
 	}
 
 	function noiseNode(channel) {
@@ -1158,7 +1128,7 @@ window.gb = function (file, canvas, options) {
 		if (initRequired) {
 			AudioEngine = []
 			sampleNumber = 0;
-			audioSampleRate = GBAudioContext.sampleRate; //not accurate but works for now
+			audioSampleRate = GBAudioContext.sampleRate;
 			bufferSize = 1024;
 			while (bufferSize / audioSampleRate < 0.016) {
 				bufferSize *= 2;
@@ -1167,11 +1137,9 @@ window.gb = function (file, canvas, options) {
 
 		GBAudioContext.createScriptProcessor = GBAudioContext.createScriptProcessor || GBAudioContext.createJavaScriptNode
 		var buffers = 4;
-		AudioEngine.buffers = buffers; // immediate audio is not possible without clicks since audio is at a diff frequency
+		AudioEngine.buffers = buffers;
 
 		if (initRequired) {
-			//if (iOS && !(NoAudioAPI)) AudioEngine.out = new iosSucksProcessorNode(GBAudioContext, bufferSize, 1);
-			//else 
 			AudioEngine.out = GBAudioContext.createScriptProcessor(bufferSize, 0, stereo ? 2 : 1);
 			AudioEngine.out.connect(GBAudioContext.destination);
 		}
@@ -1210,8 +1178,6 @@ window.gb = function (file, canvas, options) {
 		AudioEngine.avgVol = 0;
 	}
 
-	// ----- END WEB AUDIO API BACKEND -----
-
 	var duties = [0.125, 0.25, 0.5, 0.75]
 	var freqDivisors = [1 / 2, 1, 2, 3, 4, 5, 6, 7]
 	var esweepPtrs = [0x12, 0x17, 0, 0x21]
@@ -1234,7 +1200,6 @@ window.gb = function (file, canvas, options) {
 	}
 
 	function handleSweep() {
-		//if (IORAM[0x26]&1) {
 		if (AudioEngine[0].fSweepEnabled) {
 			var period = (IORAM[0x10] >> 4) & 0x7
 			if (period > 0) {
@@ -1249,7 +1214,6 @@ window.gb = function (file, canvas, options) {
 				}
 			}
 		}
-		//}
 	}
 
 	function calculateSweep(writeback) {
@@ -1325,13 +1289,13 @@ window.gb = function (file, canvas, options) {
 	}
 
 	function setVolumeChannel(channel, volume) {
-		if (IORAM[0x26] & (1 << channel)) AudioEngine[channel].volume = volume / 4; //if activated, set the volume. divide by 4 to avoid any clipping
+		if (IORAM[0x26] & (1 << channel)) AudioEngine[channel].volume = volume / 4;
 		else AudioEngine[channel].volume = 0;
 	}
 
 	var lengthPtrs = [0x14, 0x19, 0x1E, 0x23]
 
-	function triggerChannel(channel) { //todo: simplify.
+	function triggerChannel(channel) {
 
 		if (channel < 3) {
 			setChannelFrequency(channel);
@@ -1357,7 +1321,7 @@ window.gb = function (file, canvas, options) {
 			AudioEngine[0].fsweep = (period == 0) ? 8 : period;
 			AudioEngine[0].fSweepEnabled = (period + shift > 0);
 			AudioEngine[0].freqreg = IORAM[0x13] + ((IORAM[0x14] & 7) << 8);
-			if (IORAM[0x10] & 7) { calculateSweep(false); } //i don't think this affects frequency, just checks
+			if (IORAM[0x10] & 7) { calculateSweep(false); }
 		}
 
 		return unfrozen;
@@ -1418,14 +1382,17 @@ window.gb = function (file, canvas, options) {
 
 	}
 
-	// ----- GPU EMULATION -----
+	/**
+   *
+   * Graphic Processor Unit part: handles graphic display
+   */
 
 	function readDMGPalette(num) {
 		var bgpal = IORAM[0x47 + num];
 		return colours[bgpal & 3].concat(colours[(bgpal >> 2) & 3], colours[(bgpal >> 4) & 3], colours[(bgpal >> 6) & 3]);
 	}
 
-	function drawScanline(num) { //horribly unoptimised drawing code
+	function drawScanline(num) {
 		var lcdcont = IORAM[0x40];
 
 		if (lcdcont & 0x80) {
@@ -1496,7 +1463,7 @@ window.gb = function (file, canvas, options) {
 				}
 			}
 
-			if (lcdcont & 0x20) { //window
+			if (lcdcont & 0x20) {
 				var ypos = (num - IORAM[0x4A]);
 				if ((ypos >= 0) && (ypos < 144)) {
 					var xpos = 7 - IORAM[0x4B];
@@ -1558,9 +1525,8 @@ window.gb = function (file, canvas, options) {
 			}
 
 			if (lcdcont & 0x2) {
-				//cgb ordering
 				var sprOff = 39 * 4;
-				for (var i = 0; i < 40; i++) { //draw sprites
+				for (var i = 0; i < 40; i++) {
 					drawSprite(sprOff, num, palettesInt32);
 					sprOff -= 4;
 				}
@@ -1624,7 +1590,9 @@ window.gb = function (file, canvas, options) {
 		GBScreen.data.set(EmptyImageBuffer);
 	}
 
-	// ----- CARTRIDGE HARDWARE (MBC etc) EMULATION -----
+	/**
+   * Cartridges handler
+   */
 
 	var MBCTable = [
 		{ type: 0, hardware: [] },
@@ -1638,26 +1606,26 @@ window.gb = function (file, canvas, options) {
 		{ type: 0, hardware: ["RAM"] },
 		{ type: 0, hardware: ["RAM", "BATTERY"] },
 		null,
-		{ type: 6, hardware: [] },//MMM01
-		{ type: 6, hardware: ["RAM"] },
-		{ type: 6, hardware: ["RAM", "BATTERY"] },
+		{type: 6, hardware: []},
+		{type: 6, hardware: ["RAM"]},
+		{type: 6, hardware: ["RAM", "BATTERY"]},
 		null,
-		{ type: 3, hardware: ["TIMER", "BATTERY"] },
-		{ type: 3, hardware: ["TIMER", "RAM", "BATTERY"] },
-		{ type: 3, hardware: [] },
-		{ type: 3, hardware: ["RAM"] },
-		{ type: 3, hardware: ["RAM", "BATTERY"] },
+		{type: 3, hardware: ["TIMER", "BATTERY"]},
+		{type: 3, hardware: ["TIMER", "RAM", "BATTERY"]},
+		{type: 3, hardware: []},
+		{type: 3, hardware: ["RAM"]},
+		{type: 3, hardware: ["RAM", "BATTERY"]},
 		null,
-		{ type: 4, hardware: [] },
-		{ type: 4, hardware: ["RAM"] },
-		{ type: 4, hardware: ["RAM", "BATTERY"] },
+		{type: 4, hardware: []},
+		{type: 4, hardware: ["RAM"]},
+		{type: 4, hardware: ["RAM", "BATTERY"]},
 		null,
-		{ type: 5, hardware: [] },
-		{ type: 5, hardware: ["RAM"] },
-		{ type: 5, hardware: ["RAM", "BATTERY"] },
-		{ type: 5, hardware: ["RUMBLE"] },
-		{ type: 5, hardware: ["RUMBLE", "RAM"] },
-		{ type: 5, hardware: ["RUMBLE", "RAM", "BATTERY"] },
+		{type: 5, hardware: []},
+		{type: 5, hardware: ["RAM"]},
+		{type: 5, hardware: ["RAM", "BATTERY"]},
+		{type: 5, hardware: ["RUMBLE"]},
+		{type: 5, hardware: ["RUMBLE", "RAM"]},
+		{type: 5, hardware: ["RUMBLE", "RAM", "BATTERY"]},
 	]
 
 
@@ -1665,7 +1633,6 @@ window.gb = function (file, canvas, options) {
 	var MBCReadHandlers = []
 
 	MBCWriteHandlers[0] = function (w, v) {
-		//(do nothing)
 	}
 
 	MBCWriteHandlers[1] = function (w, v) {
@@ -1701,7 +1668,7 @@ window.gb = function (file, canvas, options) {
 			}
 		} else if ((w < 0xC000) && (w >= 0xA000)) {
 			if (MBC.RAMenable) {
-				if (MBC.RAMbank < 4) CRAM[w - 0xA000 + MBC.RAMbank * 0x2000] = v; //assuming no RTC! again it's unimplemented!!!!
+				if (MBC.RAMbank < 4) CRAM[w - 0xA000 + MBC.RAMbank * 0x2000] = v;
 			}
 		}
 	}
@@ -1713,7 +1680,6 @@ window.gb = function (file, canvas, options) {
 		MBC.RTC.hours = (d.getHours() + 14) % 24;
 		MBC.RTC.lowDays = Math.floor(d.getTime() / (1000 * 60 * 60 * 24)) & 255
 		MBC.RTC.hiDays = (Math.floor(d.getTime() / (1000 * 60 * 60 * 24)) & 256) >> 8
-		//RTC.seconds += (masterClock - RTC.setCycle)/
 	}
 
 	MBCWriteHandlers[5] = function (w, v) {
@@ -1785,8 +1751,6 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	//special MBC for GBS files (start at offset)
-
 	MBCWriteHandlers[2] = function (w, v) {
 		if (w < 0x2000) {
 			MBC.RAMenable = ((v & 0xF) == 0xA);
@@ -1815,7 +1779,6 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	//special MBC for GBS files (start at offset)
 
 	MBCWriteHandlers[6] = function (w, v) {
 		if ((w < 0x4000) && (w >= 0x2000)) {
@@ -1864,7 +1827,10 @@ window.gb = function (file, canvas, options) {
 		localStorage["battery/" + ROMID] = battery;
 	}
 
-	// ----- CPU EMULATION -----
+  /**
+   *
+   * Central Processor Unit (CPU) part (See CPU part of technical_documentation for more information)
+   */
 
 	function init() {
 		if (typeof GBObj.onload == "function") GBObj.onload(GBObj);
@@ -1873,7 +1839,7 @@ window.gb = function (file, canvas, options) {
 
 		if (GBMaster.gameboys.indexOf(GBObj) == -1) GBMaster.gameboys.push(GBObj);
 
-		GBObj.cycle = cycle; //expose certain functions
+		GBObj.cycle = cycle;
 		GBObj.frameCycles = 0;
 
 		for (var i = 0; i < 0x80; i++) {
@@ -1897,13 +1863,13 @@ window.gb = function (file, canvas, options) {
 		registerDebug = [];
 		instCount = 0;
 
-		prepareAudioEngine(); //have to do this even with no audio api (see above)
+		prepareAudioEngine();
 
-		tileLayerPalette.set(emptyTileLayer); //this needs to be init to all zeroes in DMG mode so CGB tile priority from the previously drawn CGB screen doesnt take effect.
+		tileLayerPalette.set(emptyTileLayer);
 
 		var mbcid = (MBCTable[game[0x147]] != null) ? game[0x147] : 0;
 		MBC = JSON.parse(JSON.stringify(MBCTable[mbcid]));
-		GBObj.MBC = MBC; //make MBC public
+		GBObj.MBC = MBC;
 
 		if (MBC.hardware.indexOf("RAM") > -1) {
 			MBC.RAMenable = false;
@@ -1925,8 +1891,8 @@ window.gb = function (file, canvas, options) {
 					hiDays: 0,
 					active: false,
 					dayCarry: false,
-					setCycle: 0, // used for cycle accurate times
-					setTime: 0, // used for resume from 
+					setCycle: 0,
+					setTime: 0,
 				}
 			}
 		}
@@ -1975,12 +1941,13 @@ window.gb = function (file, canvas, options) {
 			}
 		}
 
+    /* State Registers with 8 bit registers and flags */
 		SP = 0;
 		if (biosActive) {
-			registers = new Uint8Array([0, 0, 0, 0, 0, 0, 0]) //A, B, C, D, E, H, L
+			registers = new Uint8Array([0, 0, 0, 0, 0, 0, 0])
 		} else {
-			SP = 0xFFFE;
-			registers = new Uint8Array([CGB ? 17 : 1, 0, 0x13, 0, 0xD8, 0x01, 0x4D]) //A, B, C, D, E, H, L
+			SP = 0xFFFE; // Memory address of the top of the stack
+			registers = new Uint8Array([CGB ? 17 : 1, 0, 0x13, 0, 0xD8, 0x01, 0x4D])
 			IORAM[0x40] = 0x91;
 		}
 		flags = [0, 0, 0, 0, 1] //Z, N, H, C, true (for non conditional jumps)
@@ -1989,12 +1956,11 @@ window.gb = function (file, canvas, options) {
 		IORAM[0x44] = (biosActive) ? 0 : ((CGB) ? 144 : 153);
 		Cycles = 0;
 		LCDstate = (biosActive) ? 1 : 2;
-		IME = false; //interrupt master enable
+		IME = false;
 		halted = false;
 		palettes = new Uint8Array(readDMGPalette(0).concat(readDMGPalette(1), readDMGPalette(2)));
 		palettesInt32 = new Uint32Array(palettes.buffer);
 
-		//cyclesAtLastAudio = 0;
 		masterClock = 0;
 		lineCycles = 0;
 		soundCycles = 0;
@@ -2003,7 +1969,6 @@ window.gb = function (file, canvas, options) {
 		audioCycles = 0;
 		cyclesForSample = 4194304 / audioSampleRate;
 		divCounts = 0;
-		//timerCounts = 0;
 
 		audioSyncFrames = 0;
 
@@ -2011,35 +1976,30 @@ window.gb = function (file, canvas, options) {
 		prepareGBScreen();
 		if (typeof GBObj.onstart == "function") GBObj.onstart();
 		GBObj.onstart = null;
-		//timeBetweenFrames = Date.now();
 	}
 
 	this.setButtonByte = function (b) {
 		buttonByte = b;
 	}
 
-	this.prepareButtonByte = function () { //for default included controls system
+	this.prepareButtonByte = function () {
 		buttonByte = ((keysArray[keyConfig.DOWN]) << 3) + ((keysArray[keyConfig.UP]) << 2) + ((keysArray[keyConfig.LEFT]) << 1) + ((keysArray[keyConfig.RIGHT]) << 0) + ((keysArray[keyConfig.START]) << 7) + ((keysArray[keyConfig.SELECT]) << 6) + ((keysArray[keyConfig.B]) << 5) + (keysArray[keyConfig.A] << 4);
 
-		if (getGamepads) { //gamepad support present!
-			//if (navigator.webkitGetGamepads) var gamepads = navigator.webkitGetGamepads();
-			//if (navigator.webkitGamepads) var gamepads = navigator.webkitGamepads();
+		if (getGamepads) {
 			if (navigator.getGamepads) var gamepads = navigator.getGamepads();
 			for (var i = 0; i < gamepads.length; i++) {
 				if (gamepads[i] != null) {
 					var j = gamepads[i];
 
-					//TODO: custom bindings for controllers
+					if (j.axes[0] > 0.5 || j.buttons[15].pressed) buttonByte ^= 1 << 0;
+					if (j.axes[0] < -0.5 || j.buttons[14].pressed) buttonByte ^= 1 << 1;
+					if (j.axes[1] > 0.5 || j.buttons[13].pressed) buttonByte ^= 1 << 3;
+					if (j.axes[1] < -0.5 || j.buttons[12].pressed) buttonByte ^= 1 << 2;
 
-					if (j.axes[0] > 0.5 || j.buttons[15].pressed) buttonByte ^= 1 << 0; //right
-					if (j.axes[0] < -0.5 || j.buttons[14].pressed) buttonByte ^= 1 << 1; //left
-					if (j.axes[1] > 0.5 || j.buttons[13].pressed) buttonByte ^= 1 << 3; //down
-					if (j.axes[1] < -0.5 || j.buttons[12].pressed) buttonByte ^= 1 << 2; //up
-
-					if (j.buttons[9].pressed) buttonByte ^= 1 << 7; //start
-					if (j.buttons[8].pressed) buttonByte ^= 1 << 6; //select
-					if (j.buttons[0].pressed) buttonByte ^= 1 << 5; //B
-					if (j.buttons[1].pressed) buttonByte ^= 1 << 4; //A
+					if (j.buttons[9].pressed) buttonByte ^= 1 << 7;
+					if (j.buttons[8].pressed) buttonByte ^= 1 << 6;
+					if (j.buttons[0].pressed) buttonByte ^= 1 << 5;
+					if (j.buttons[1].pressed) buttonByte ^= 1 << 4;
 				}
 			}
 
@@ -2048,7 +2008,7 @@ window.gb = function (file, canvas, options) {
 
 	this.audioSyncUpdate = function () {
 		try {
-			if (GBObj.paused) return; //don't run!
+			if (GBObj.paused) return;
 			if (!GBObj.options.cButByte) GBObj.prepareButtonByte();
 			if (NoAudioAPI) audioSyncFrames++;
 			frameskip = false;
@@ -2065,7 +2025,7 @@ window.gb = function (file, canvas, options) {
 				audioSyncFrames--;
 				if (Date.now() - frameStart > 16) {
 					audioSyncFrames = 1;
-					break; //can't make it back to audio sync, break out of loop before you freeze the gb
+					break;
 				}
 				frameskip = true;
 			}
@@ -2075,8 +2035,8 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	function errorScreen(err) { //display when something goes horribly wrong
-		GBObj.paused = true; //stop executing before we cause any more damage
+	function errorScreen(err) {
+		GBObj.paused = true;
 
 		internalCtx.fillStyle = "#FFFFFF"
 		internalCtx.fillRect(0, 0, 160, 144);
@@ -2142,9 +2102,8 @@ window.gb = function (file, canvas, options) {
 
 		while (masterClock - timerCycles >= 16) {
 			divCounts = (divCounts + 1) & 63
-			//timerCounts++
 			timerCycles += 16;
-			if ((divCounts & 15) == 0) IORAM[0x04] = (IORAM[0x04] + 1) & 0xFF; //"hey rhys why don't you just do IORAM[0x04]++ ???" i can't because apple decided to break the basic functionality of typed arrays like utter twats
+			if ((divCounts & 15) == 0) IORAM[0x04] = (IORAM[0x04] + 1) & 0xFF;
 			if ((IORAM[0x07] & 4) && ((divCounts & timerMods[IORAM[0x07] & 3]) == 0)) {
 				IORAM[0x05] = (IORAM[0x05] + 1) & 0xFF;
 				if (instCount % 25000 == 0)
@@ -2161,44 +2120,43 @@ window.gb = function (file, canvas, options) {
 
 		if (lineCycles >= 456) {
 			IORAM[0x44] = (IORAM[0x44] + 1) % 154
-			if ((IORAM[0x44] == IORAM[0x45]) && (IORAM[0x40] & 0x80)) handleScanCoin(); //scanline coincidence
+			if ((IORAM[0x44] == IORAM[0x45]) && (IORAM[0x40] & 0x80)) handleScanCoin();
 			else IORAM[0x41] &= 0xFB
 			lineCycles -= 456
 			if (IORAM[0x44] == 144) {
 				drawFrame();
 				LCDstate = 1;
-				//vbl interrupt
 				if (IORAM[0x40] & 0x80) {
 					IORAM[0x0F] |= 0x1
-					if (IORAM[0x41] & 0x10) { //lcdstat vbl
+					if (IORAM[0x41] & 0x10) {
 						IORAM[0x0F] |= 0x2
 					}
 				}
 			} else if (IORAM[0x44] == 0) {
 				LCDstate = 2;
-				if ((IORAM[0x41] & 0x20) && (IORAM[0x40] & 0x80)) { //lcdstat mode2
+				if ((IORAM[0x41] & 0x20) && (IORAM[0x40] & 0x80)) {
 					IORAM[0x0F] |= 0x2
 				}
 			}
 		}
 
-		if (LCDstate != 1) { //handling LCD STAT & STAT interrupts
-			if (lineCycles <= 80) { //State 2 lasts 80
+		if (LCDstate != 1) {
+			if (lineCycles <= 80) {
 				if (LCDstate != 2) {
 					LCDstate = 2
 					if ((IORAM[0x41] & 0x20) && (IORAM[0x40] & 0x80)) {
 						IORAM[0x0F] |= 0x2
 					}
 				}
-			} else if (lineCycles <= 252) { //State 3 lasts 172
+			} else if (lineCycles <= 252) {
 				if (LCDstate != 3) {
 					LCDstate = 3
 				}
-			} else { //State 0 is the rest
+			} else {
 				if (LCDstate != 0) {
 					LCDstate = 0
 					if (CGBDMA.active && CGBDMA.mode) { CGBDMAStep(16); }
-					if (!(frameskip)) drawScanline(IORAM[0x44]); //draw scan on hblank (assuming the OAM and VRAM access = time the LCD is not drawing). this is not correct (breaks demotronic demo) but it will do for now
+					if (!(frameskip)) drawScanline(IORAM[0x44]);
 					if ((IORAM[0x41] & 0x8) && (IORAM[0x40] & 0x80)) {
 						IORAM[0x0F] |= 0x2
 					}
@@ -2206,7 +2164,7 @@ window.gb = function (file, canvas, options) {
 			}
 		}
 
-		if (masterClock - soundCycles >= 8192 * CPUSpeed) { //sound clock
+		if (masterClock - soundCycles >= 8192 * CPUSpeed) {
 			soundCycles += 8192 * CPUSpeed
 
 			if (IORAM[0x26] & 0x80) {
@@ -2225,7 +2183,7 @@ window.gb = function (file, canvas, options) {
 
 
 		var mask = IORAM[0x0F] & ZRAM[0x7F]
-		if (halted && mask) { //if we can stop the halt now, do it
+		if (halted && mask) {
 			halted = false;
 		} else if (halted) {
 			haltSkip();
@@ -2310,12 +2268,12 @@ window.gb = function (file, canvas, options) {
 			else return bios[pointer];
 		} else if (pointer < 0x8000) {
 			if (CGB && biosActive && (pointer >= 0x200) && (pointer < 0x900)) return CGBbios[pointer];
-			else return MBCReadHandler(pointer) | 0; //can be undefined if stupid stuff happens
+			else return MBCReadHandler(pointer) | 0;
 		} else if (pointer < 0xA000) {
 			if (CGB) return VRAM[pointer - 0x8000 + 0x2000 * IORAM[0x4F]];
 			else return VRAM[pointer - 0x8000];
 		} else if (pointer < 0xC000) {
-			return MBCReadHandler(pointer) | 0; //even the RAM
+			return MBCReadHandler(pointer) | 0;
 		} else if (pointer < 0xE000) {
 			if (CGB) {
 				if (pointer < 0xD000) return RAM[pointer - 0xC000];
@@ -2329,7 +2287,7 @@ window.gb = function (file, canvas, options) {
 		} else if (pointer < 0xFEA0) {
 			return OAM[pointer - 0xFE00];
 		} else if (pointer < 0xFF00) {
-			return 0; //unusable
+			return 0;
 		} else if (pointer < 0xFF80) {
 			return IOReadFunctions[pointer - 0xFF00](pointer - 0xFF00);
 		} else {
@@ -2353,7 +2311,6 @@ window.gb = function (file, canvas, options) {
 			} else RAM[pointer - 0xC000] = value;
 		} else if (pointer < 0xFE00) {
 			console.log("writing to shadow ram?")
-			// debugger;
 			if (CGB) {
 				if (pointer < 0xF000) RAM[pointer - 0xE000] = value;
 				else RAM[(pointer - 0xF000) + 0x1000 * IORAM[0x70]] = value;
@@ -2368,72 +2325,57 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	// ----- HALT CYCLE SKIP -----
 
 	function haltSkip() {
 
 		var interruptCycles = [
-			Infinity, //vbl
-			Infinity, //lcdstat
-			Infinity, //clock
+			Infinity,
+			Infinity,
+			Infinity,
 			Infinity,
 			Infinity,
 		]
 
-		var skipTo = Infinity; //(70224-GBObj.frameCycles)*CPUSpeed; //max skip distance is the next frame
+		var skipTo = Infinity;
 
-		//timer prediction
 
-		if (IORAM[0x07] & 4) { //only check if clock is enabled.
-			//clock ticks until next interrupt given by 256-IORAM[0x05]
-			//we need to work back to get the cycles until the next timer interrupt.
+		if (IORAM[0x07] & 4) {
 
-			var cycles = (256 - IORAM[0x05]) - 1; //distance to timer overflow, minus 1 as the first tick's duration is NOT a full set of cycles, but instead a fraction.
-			cycles *= 16 * (timerMods[IORAM[0x07] & 3] + 1); //multiply by cycle length of one clock tick.
-			cycles += 16 - (masterClock - timerCycles); //time to first clock check
-			cycles += 16 * (timerMods[IORAM[0x07] & 3] - (divCounts & timerMods[IORAM[0x07] & 3])); //time after first clock tick to first div counter tick
+			var cycles = (256 - IORAM[0x05]) - 1;
+			cycles *= 16 * (timerMods[IORAM[0x07] & 3] + 1);
+			cycles += 16 - (masterClock - timerCycles);
+			cycles += 16 * (timerMods[IORAM[0x07] & 3] - (divCounts & timerMods[IORAM[0x07] & 3]));
 
 			interruptCycles[2] = cycles;
 			if ((ZRAM[0x7F] & 0x4) && cycles < skipTo) skipTo = cycles;
 		}
 
-		if (IORAM[0x40] & 0x80) { //only if screen enabled 
-			//VBL predicion, can also cause an lcd stat interrupt!
+		if (IORAM[0x40] & 0x80) {
 			var linesToVBL = 144 - IORAM[0x44];
-			if (linesToVBL <= 0) linesToVBL += 154; //handle wraparound for vbl
-			var cycles = ((linesToVBL - 1) * 456 + (456 - lineCycles)) * CPUSpeed; //calculate cycles to next vbl, mul by CPUSpeed
+			if (linesToVBL <= 0) linesToVBL += 154;
+			var cycles = ((linesToVBL - 1) * 456 + (456 - lineCycles)) * CPUSpeed;
 
 			interruptCycles[0] = cycles;
-			if (IORAM[0x41] & 0x10) interruptCycles[1] = cycles; //lcdstat on vbl
+			if (IORAM[0x41] & 0x10) interruptCycles[1] = cycles;
 
-			if ((ZRAM[0x7F] & 0x1) && cycles < skipTo) skipTo = cycles; //if vbl interrupt flag set, wake on vbl.
+			if ((ZRAM[0x7F] & 0x1) && cycles < skipTo) skipTo = cycles;
 
-			//LCDStat predicton.
-
-			//lcdstat mode 0 fires at hblank
-			//lcdstat mode 1 is vbl (already handled)
-			//lcdstat mode 2 fires at start of horizontal raster
-			//lcdstat mode 3 is scanline coincidence.
-
-			//scanline coincidence:
 			if (IORAM[0x41] & 0x40) {
 				linesToVBL = IORAM[0x45] - IORAM[0x44];
-				if (linesToVBL <= 0) linesToVBL += 154; //handle wraparound for vbl
-				var cycles = ((linesToVBL - 1) * 456 + (456 - lineCycles)) * CPUSpeed; //calculate cycles to next vbl, mul by CPUSpeed
+				if (linesToVBL <= 0) linesToVBL += 154;
+				var cycles = ((linesToVBL - 1) * 456 + (456 - lineCycles)) * CPUSpeed;
 
-				if (interruptCycles[1] > cycles) interruptCycles[1] = cycles; //lcdstat on scancoin
+				if (interruptCycles[1] > cycles) interruptCycles[1] = cycles;
 			}
 
-			if (IORAM[0x41] & 0x28) { //lcdstat modes 0 and 2 only fire when screen is not in vblank.
-				//if we are already past the last hblank or oam before the vblank we will need to add
-				//the number of cycles it takes to bring us back to line 0.
+			if (IORAM[0x41] & 0x28) {
 				var blankCycles = 0;
-				if (IORAM[0x44] > 142) { //vbl active, we need to wait until screen resets to line 0.
+				if (IORAM[0x44] > 142) {
 					blankCycles = ((153 - IORAM[0x44]) * 456 + (456 - lineCycles)) * CPUSpeed
 				}
 
-				if (IORAM[0x41] & 0x8) { //mode 0: hblank interrupt
-					if ((IORAM[0x44] > 143) || ((IORAM[0x44] == 143) && lineCycles > 252)) { //after lineCycle 252 in line 143 there are no more hblanks until the next interrupt.
+				if (IORAM[0x41] & 0x8) {
+					if ((IORAM[0x44] > 143) || ((IORAM[0x44] == 143) && lineCycles > 252)) {
 						var cycles = blankCycles + (252 * CPUSpeed)
 						if (interruptCycles[1] > cycles) interruptCycles[1] = cycles;
 					} else {
@@ -2444,7 +2386,7 @@ window.gb = function (file, canvas, options) {
 					}
 				}
 
-				if (IORAM[0x41] & 0x20) { //mode 2: OAM interrupt
+				if (IORAM[0x41] & 0x20) {
 					if (IORAM[0x44] > 143) {
 						var cycles = blankCycles;
 						if (interruptCycles[1] > cycles) interruptCycles[1] = cycles;
@@ -2458,25 +2400,15 @@ window.gb = function (file, canvas, options) {
 			if ((ZRAM[0x7F] & 0x2) && interruptCycles[1] < skipTo) skipTo = interruptCycles[1];
 		}
 
-		//now we have our predictions...
-		//skip to next interrupt on main clock
-		//set all interrupt flags that should be set
-		//advance the screen, audio and timer correctly.
-
 		var frameEnd = (70224 - GBObj.frameCycles) * CPUSpeed;
 		if (frameEnd < skipTo) {
-			skipTo = frameEnd; //we will remain halted after we skip to the end of this frame
-			//todo: remember where we're meant to skip to?
+			skipTo = frameEnd;
 		} else {
 			halted = false;
 		}
 
-		//screen update
-
 		masterClock += skipTo;
 		lineCycles += skipTo / CPUSpeed;
-
-		//need to check if we bypass next scan's render cycle (at start of hblank), and draw the scan if we do.
 
 		if ((LCDstate == 2 || LCDstate == 3) && lineCycles > 252) {
 			if (CGBDMA.active && CGBDMA.mode) { CGBDMAStep(16); }
@@ -2494,7 +2426,7 @@ window.gb = function (file, canvas, options) {
 			}
 		}
 
-		if ((IORAM[0x44] == IORAM[0x45]) && (IORAM[0x40] & 0x80)) handleScanCoin(); //scanline coincidence
+		if ((IORAM[0x44] == IORAM[0x45]) && (IORAM[0x40] & 0x80)) handleScanCoin();
 		else IORAM[0x41] &= 0xFB;
 
 		if (IORAM[0x44] < 144) {
@@ -2505,27 +2437,20 @@ window.gb = function (file, canvas, options) {
 			LCDstate = 1;
 		}
 
-		//timer update
+		var divCountUpdates = (masterClock - timerCycles) >> 4;
 
-		var divCountUpdates = (masterClock - timerCycles) >> 4; //number of div count updates
-
-		IORAM[0x04] = (IORAM[0x04] + (divCountUpdates >> 4)) & 0xFF; //advance static clock
+		IORAM[0x04] = (IORAM[0x04] + (divCountUpdates >> 4)) & 0xFF;
 
 		if (IORAM[0x07] & 4) {
-			//advance dynamic clock
-			//need to be careful because usually this does not start from 0
 			var mod = timerMods[IORAM[0x07] & 3];
 			var dynamicClockChanges = (divCountUpdates / (mod + 1)) | 0;
 			if ((divCountUpdates & mod) + (divCounts & mod) > mod) dynamicClockChanges++;
-			IORAM[0x05] = IORAM[0x06] + (((IORAM[0x05] - IORAM[0x06]) + dynamicClockChanges) % (256 - IORAM[0x06])); //overflows restart at 0. Bound clock sum to between start value and 255 with modulus.
+			IORAM[0x05] = IORAM[0x06] + (((IORAM[0x05] - IORAM[0x06]) + dynamicClockChanges) % (256 - IORAM[0x06]));
 		}
 		divCounts = (divCounts + divCountUpdates) & 63;
-		timerCycles += 16 * divCountUpdates; //left over cycles
+		timerCycles += 16 * divCountUpdates;
 
-		//sound update
-		//we need to do this in chunks - meaning generate the audio in sound update space sized chunks.
-
-		while (masterClock - soundCycles >= 8192 * CPUSpeed) { //sound clock
+		while (masterClock - soundCycles >= 8192 * CPUSpeed) {
 			while (soundCycles - audioCycles >= cyclesForSample) {
 				audioCycles += cyclesForSample;
 				squareWaveNode(0);
@@ -2559,19 +2484,15 @@ window.gb = function (file, canvas, options) {
 			if (++AudioEngine.out.bufferPos == bufferSize) advanceBufWrite(AudioEngine.out);
 		}
 
-
-		//set interrupt flags
-
 		for (var i = 0; i < 5; i++) if (skipTo >= interruptCycles[i] && interruptCycles[i] != Infinity) IORAM[0x0F] |= 1 << i;
 		GBObj.frameCycles += skipTo / CPUSpeed;
 
 		return skipTo;
 	}
 
-	// ----- BEGIN INSTRUCTIONS -----
-
-
-	//Bitwise Instructions
+/**
+ * CPU Instructions
+ */
 
 	function PrefixCB() {
 		PC &= 0xFFFF;
@@ -2641,8 +2562,6 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 0;
 		flags[2] = 0;
 	}
-
-	//now the shifts and rotates for HL
 
 
 	function RLCHL() {
@@ -2733,18 +2652,16 @@ window.gb = function (file, canvas, options) {
 		MemWrite(HLN, HL);
 	}
 
-	//END SHIFTS AND ROTATES
-
 
 	function BIT(bit, reg) {
-		flags[0] = 1 - (((bit == 0) ? registers[reg] : (registers[reg] >> bit)) & 1); //bit == 0 check is to work around 32-bit iOS7 bug
+		flags[0] = 1 - (((bit == 0) ? registers[reg] : (registers[reg] >> bit)) & 1);
 		flags[1] = 0;
 		flags[2] = 1;
 	}
 
 	function BITHL(bit) {
 		var val = MemRead((registers[5] << 8) + registers[6])
-		flags[0] = 1 - (((bit == 0) ? val : (val >> bit)) & 1); //bit == 0 check is to work around 32-bit iOS7 bug
+		flags[0] = 1 - (((bit == 0) ? val : (val >> bit)) & 1);
 		flags[1] = 0;
 		flags[2] = 1;
 	}
@@ -2767,21 +2684,20 @@ window.gb = function (file, canvas, options) {
 		MemWrite(HL, (MemRead(HL) | (1 << bit)));
 	}
 
-	// LD and other load things
 
-	function LD(dest, src) { // LD dest, src
+	function LD(dest, src) {
 		registers[dest] = registers[src]
 	}
 
-	function LDFHL(reg) { // "LD from HL": LD reg, (HL)
+	function LDFHL(reg) {
 		registers[reg] = MemRead((registers[5] << 8) + registers[6]);
 	}
 
-	function LDTHL(reg) { // "LD to HL": LD (HL), reg
+	function LDTHL(reg) {
 		MemWrite((registers[5] << 8) + registers[6], registers[reg]);
 	}
 
-	function LD_M_A() { // LD (a16), A
+	function LD_M_A() {
 		PC &= 0xFFFF;
 		var temp = MemRead(PC++);
 		PC &= 0xFFFF;
@@ -2789,7 +2705,7 @@ window.gb = function (file, canvas, options) {
 		MemWrite(temp, registers[0]);
 	}
 
-	function LD_A_M() { // LD A, (a16)
+	function LD_A_M() {
 		PC &= 0xFFFF;
 		var temp = MemRead(PC++);
 		PC &= 0xFFFF;
@@ -2797,23 +2713,23 @@ window.gb = function (file, canvas, options) {
 		registers[0] = MemRead(temp);
 	}
 
-	function LD_HL_SPM() { // LD HL, SP+r8 (that's a mouthful)
+	function LD_HL_SPM() {
 		PC &= 0xFFFF;
 		var temp = MemRead(PC++);
 		if (temp > 127) temp -= 256;
 		var HL = (SP + temp) & 0xFFFF;
-		flags = [0, 0, (((SP & 0xF) + (temp & 0xF)) & 0x10) >> 4, (((SP & 0xFF) + (temp & 0xFF)) & 0x100) >> 8, 1]; //are the flags meant to be stupid on these ones?
+		flags = [0, 0, (((SP & 0xF) + (temp & 0xF)) & 0x10) >> 4, (((SP & 0xFF) + (temp & 0xFF)) & 0x100) >> 8, 1];
 		registers[5] = HL >> 8;
 		registers[6] = HL & 0xFF;
 		Cycles += 4;
 	}
 
-	function LDSPHL() { // LD SP, HL
+	function LDSPHL() {
 		SP = (registers[5] << 8) + registers[6];
 		Cycles += 4;
 	}
 
-	function LDSP() { // LD (a16), SP
+	function LDSP() {
 		PC &= 0xFFFF;
 		var temp = MemRead(PC++);
 		PC &= 0xFFFF;
@@ -2822,7 +2738,7 @@ window.gb = function (file, canvas, options) {
 		MemWrite((temp + 1) & 0xFFFF, SP >> 8);
 	}
 
-	function ADDSP() { // ADD SP, r8
+	function ADDSP() {
 		PC &= 0xFFFF;
 		var temp = MemRead(PC++);
 		if (temp > 127) temp -= 256;
@@ -2832,67 +2748,64 @@ window.gb = function (file, canvas, options) {
 		Cycles += 8;
 	}
 
-	//LDH
 
-	function LDH_M_A() { // LDH (a8), A
+	function LDH_M_A() {
 		PC &= 0xFFFF;
 		var temp = MemRead(PC++);
 		MemWrite(temp + 0xFF00, registers[0]);
 	}
 
-	function LDH_A_M() { // LDH A, (a8)
+	function LDH_A_M() {
 		PC &= 0xFFFF;
 		var temp = MemRead(PC++);
 		registers[0] = MemRead(temp + 0xFF00);
 	}
 
-	function LDH_C_A() { // LDH (C), A
+	function LDH_C_A() {
 		MemWrite(registers[2] + 0xFF00, registers[0]);
 	}
 
-	function LDH_A_C() { // LDH A, (C)
+	function LDH_A_C() {
 		registers[0] = MemRead(registers[2] + 0xFF00);
 	}
 
-	// Stack Instructions
 
-	function PUSH(reg16) { // PUSH reg16
+	function PUSH(reg16) {
 		StackPush((registers[reg16] << 8) + registers[reg16 + 1]);
 		Cycles += 4;
 	}
 
-	function PUSHAF() { // PUSH AF
+	function PUSHAF() {
 		StackPush((registers[0] << 8) + (flags[0] << 7) + (flags[1] << 6) + (flags[2] << 5) + (flags[3] << 4));
 		Cycles += 4;
 	}
 
-	function POP(reg16) { // POP reg16
+	function POP(reg16) {
 		registers[reg16] = MemRead((SP + 1) & 0xFFFF);
 		registers[reg16 + 1] = MemRead(SP);
 		SP = (SP + 2) & 0xFFFF
 
 	}
 
-	function POPAF() { // POP AF
+	function POPAF() {
 		registers[0] = MemRead((SP + 1) & 0xFFFF);
 		var temp = MemRead(SP);
 		SP = (SP + 2) & 0xFFFF
 		flags = [temp >> 7, (temp >> 6) & 0x1, (temp >> 5) & 0x1, (temp >> 4) & 0x1, 1];
 	}
 
-	function StackPush(value) { //Generic Push Funcion
+	function StackPush(value) {
 		SP = (SP - 2) & 0xFFFF;
 		MemWrite(SP, value & 0xFF)
 		MemWrite((SP + 1) & 0xFFFF, value >> 8)
 
 	}
 
-	function StackPop() { //Generic Pop Function
+	function StackPop() {
 		SP = (SP + 2) & 0xFFFF
 		return MemRead((SP - 2) & 0xFFFF) + (MemRead((SP - 1) & 0xFFFF) << 8)
 	}
 
-	// Standalone Instructions
 
 	function DAA() {
 		var tempa = registers[0]
@@ -2926,9 +2839,12 @@ window.gb = function (file, canvas, options) {
 		flags[2] = 0;
 	}
 
-	//Arithmetic (third quarter of instructions)
+	/**
+   *
+   * Arithmetic Unit
+   */
 
-	function ADD(reg) { // ADD A, reg
+	function ADD(reg) {
 		var temp = registers[0] + registers[reg]
 		flags[2] = (((registers[0] & 0xF) + (registers[reg] & 0xF))) >> 4
 		flags[3] = temp >> 8
@@ -2937,7 +2853,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 0;
 	}
 
-	function ADDHL() { // ADD A, HL
+	function ADDHL() {
 		var read = MemRead((registers[5] << 8) + registers[6]);
 		var temp = registers[0] + read
 		flags[2] = (((registers[0] & 0xF) + (read & 0xF))) >> 4
@@ -2947,7 +2863,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 0;
 	}
 
-	function ADDM() { // ADD A, d8
+	function ADDM() {
 		PC &= 0xFFFF;
 		var read = MemRead(PC++);
 		var temp = registers[0] + read
@@ -2958,7 +2874,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 0;
 	}
 
-	function ADC(reg) { // ADC A, reg
+	function ADC(reg) {
 		var temp = registers[0] + registers[reg] + flags[3]
 		flags[2] = (((registers[0] & 0xF) + (registers[reg] & 0xF) + flags[3])) >> 4
 		flags[3] = temp >> 8
@@ -2967,7 +2883,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 0;
 	}
 
-	function ADCHL() { // ADC A, HL
+	function ADCHL() {
 		var read = MemRead((registers[5] << 8) + registers[6]);
 		var temp = registers[0] + read + flags[3]
 		flags[2] = (((registers[0] & 0xF) + (read & 0xF) + flags[3])) >> 4
@@ -2977,7 +2893,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 0;
 	}
 
-	function ADCM() { // ADC A, d8
+	function ADCM() {
 		PC &= 0xFFFF;
 		var read = MemRead(PC++);
 		var temp = registers[0] + read + flags[3]
@@ -2988,7 +2904,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 0;
 	}
 
-	function SUB(reg) { // SUB A, reg
+	function SUB(reg) {
 		var temp = registers[0] - registers[reg]
 		flags[2] = (((registers[0] & 0xF) - (registers[reg] & 0xF)) < 0) ? 1 : 0
 		flags[3] = (temp < 0) ? 1 : 0
@@ -2997,7 +2913,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 1;
 	}
 
-	function SUBHL() { // SUB A, HL
+	function SUBHL() {
 		var read = MemRead((registers[5] << 8) + registers[6]);
 		var temp = registers[0] - read
 		flags[2] = (((registers[0] & 0xF) - (read & 0xF)) < 0) ? 1 : 0
@@ -3007,7 +2923,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 1;
 	}
 
-	function SUBM() { // SUB A, d8
+	function SUBM() {
 		PC &= 0xFFFF;
 		var read = MemRead(PC++);
 		var temp = registers[0] - read
@@ -3018,7 +2934,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 1;
 	}
 
-	function SBC(reg) { // SBC A, reg
+	function SBC(reg) {
 		var temp = registers[0] - registers[reg] - flags[3]
 		flags[2] = (((registers[0] & 0xF) - (registers[reg] & 0xF) - flags[3]) < 0) ? 1 : 0
 		flags[3] = (temp < 0) ? 1 : 0
@@ -3028,7 +2944,7 @@ window.gb = function (file, canvas, options) {
 
 	}
 
-	function SBCHL() { // SBC A, HL
+	function SBCHL() {
 		var read = MemRead((registers[5] << 8) + registers[6]);
 		var temp = registers[0] - read - flags[3]
 		flags[2] = (((registers[0] & 0xF) - (read & 0xF) - flags[3]) < 0) ? 1 : 0
@@ -3038,7 +2954,7 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 1;
 	}
 
-	function SBCM() { // SBC A, d8
+	function SBCM() {
 		PC &= 0xFFFF;
 		var read = MemRead(PC++);
 		var temp = registers[0] - read - flags[3]
@@ -3049,66 +2965,66 @@ window.gb = function (file, canvas, options) {
 		flags[1] = 1;
 	}
 
-	function AND(reg) { // AND A, reg
+	function AND(reg) {
 		registers[0] &= registers[reg];
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 1, 0, 1]
 	}
 
-	function ANDHL() { // AND A, HL
+	function ANDHL() {
 		registers[0] &= MemRead((registers[5] << 8) + registers[6]);
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 1, 0, 1]
 	}
 
-	function ANDM() { // AND A, d8
+	function ANDM() {
 		PC &= 0xFFFF;
 		registers[0] &= MemRead(PC++);
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 1, 0, 1]
 	}
 
-	function XOR(reg) { // XOR A, reg
+	function XOR(reg) {
 		registers[0] ^= registers[reg];
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 0, 0, 1]
 	}
 
-	function XORHL() { // XOR A, HL
+	function XORHL() {
 		registers[0] ^= MemRead((registers[5] << 8) + registers[6]);
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 0, 0, 1]
 	}
 
-	function XORM() { // XOR A, d8
+	function XORM() {
 		PC &= 0xFFFF;
 		registers[0] ^= MemRead(PC++);
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 0, 0, 1]
 	}
 
-	function OR(reg) { // OR A, reg
+	function OR(reg) {
 		registers[0] |= registers[reg];
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 0, 0, 1]
 	}
 
-	function ORHL() { // OR A, HL
+	function ORHL() {
 		registers[0] |= MemRead((registers[5] << 8) + registers[6]);
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 0, 0, 1]
 	}
 
-	function ORM() { // OR A, d8
+	function ORM() {
 		PC &= 0xFFFF;
 		registers[0] |= MemRead(PC++);
 		flags = [(registers[0] == 0) ? 1 : 0, 0, 0, 0, 1]
 	}
 
-	function CP(reg) { // CP A, reg
+	function CP(reg) {
 		var temp = registers[0] - registers[reg]
 		flags = [((temp & 0xFF) == 0) ? 1 : 0, 1, (((registers[0] & 0xF) - (registers[reg] & 0xF)) < 0) ? 1 : 0, (temp < 0) ? 1 : 0, 1]
 	}
 
-	function CPHL() { // CP A, HL
+	function CPHL() {
 		var read = MemRead((registers[5] << 8) + registers[6]);
 		var temp = registers[0] - read
 		flags = [((temp & 0xFF) == 0) ? 1 : 0, 1, (((registers[0] & 0xF) - (read & 0xF)) < 0) ? 1 : 0, (temp < 0) ? 1 : 0, 1]
 	}
 
-	function CPM() { // CP A, d8
+	function CPM() {
 		PC &= 0xFFFF;
 		var read = MemRead(PC++);
 		var temp = registers[0] - read
@@ -3116,9 +3032,7 @@ window.gb = function (file, canvas, options) {
 	}
 
 
-	// General Purpose
-
-	function CHL(value) { //silently changes HL, used with LD (HL+), A etc
+	function CHL(value) {
 		var HL = (registers[5] << 8) + registers[6]
 		HL = (HL + value) & 0xFFFF;
 		registers[5] = HL >> 8;
@@ -3126,7 +3040,7 @@ window.gb = function (file, canvas, options) {
 	}
 
 	function NOP() {
-		//it doesn't do anything
+    //No Operation
 	}
 
 	function STOP() {
@@ -3141,23 +3055,21 @@ window.gb = function (file, canvas, options) {
 			cyclesForSample = (4194304 * CPUSpeed) / audioSampleRate;
 			IORAM[0x4D] = 0;
 		} else {
-			//um
 		}
 	}
 
-	function HALT() { //"halt" seems so much more menacing than "stop"
+	function HALT() {
 		halted = true;
 	}
 
-	function UNIMP() { //just ignore unimps
-		//alert("wtf");
+	function UNIMP() {
 	}
 
-	function EI() { //enables interrupts
+	function EI() {
 		IME = true;
 	}
 
-	function DI() { //disables interrupts
+	function DI() {
 		IME = false;
 	}
 
@@ -3168,9 +3080,8 @@ window.gb = function (file, canvas, options) {
 		Cycles += 4;
 	}
 
-	// Jumps
 
-	function JR(condition, target) { //Jump relative if the condition flag = the target value.
+	function JR(condition, target) {
 		Cycles += 4;
 		if (flags[condition] == target) {
 			PC &= 0xFFFF;
@@ -3196,7 +3107,7 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	function JPHL() { // JP (HL)
+	function JPHL() {
 		PC = (registers[5] << 8) + registers[6];
 	}
 
@@ -3214,7 +3125,7 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	function NRET() { //normal ret since it takes less cycles
+	function NRET() {
 		PC = StackPop();
 		Cycles += 4;
 	}
@@ -3228,24 +3139,23 @@ window.gb = function (file, canvas, options) {
 		}
 	}
 
-	// uh
 
-	function LDMA(reg16) { // LD (reg16), A
+	function LDMA(reg16) {
 		MemWrite((registers[reg16] << 8) + registers[reg16 + 1], registers[0]);
 	}
 
-	function LDAM(reg16) { // LD A, (reg16)
+	function LDAM(reg16) {
 		registers[0] = MemRead((registers[reg16] << 8) + registers[reg16 + 1]);
 	}
 
-	function LD16M(reg16) { // LD reg16, d16
+	function LD16M(reg16) {
 		PC &= 0xFFFF;
 		registers[reg16 + 1] = MemRead(PC++);
 		PC &= 0xFFFF;
 		registers[reg16] = MemRead(PC++);
 	}
 
-	function LDSPM() { // LD SP, d16
+	function LDSPM() {
 		PC &= 0xFFFF;
 		var temp = MemRead(PC++);
 		PC &= 0xFFFF;
@@ -3253,9 +3163,8 @@ window.gb = function (file, canvas, options) {
 		SP = temp
 	}
 
-	// Increment/Decrement
 
-	function INC16(reg16) { // INC reg16
+	function INC16(reg16) {
 		var temp = (registers[reg16] << 8) + registers[reg16 + 1];
 		temp = (temp + 1) & 0xFFFF;
 		registers[reg16] = temp >> 8;
@@ -3263,12 +3172,12 @@ window.gb = function (file, canvas, options) {
 		Cycles += 4;
 	}
 
-	function INCSP() { // INC SP
+	function INCSP() {
 		SP = (SP + 1) & 0xFFFF;
 		Cycles += 4;
 	}
 
-	function DEC16(reg16) { // DEC reg16
+	function DEC16(reg16) {
 		var temp = (registers[reg16] << 8) + registers[reg16 + 1];
 		temp = (temp - 1) & 0xFFFF;
 		registers[reg16] = temp >> 8;
@@ -3276,19 +3185,19 @@ window.gb = function (file, canvas, options) {
 		Cycles += 4;
 	}
 
-	function DECSP() { // DEC SP
+	function DECSP() {
 		SP = (SP - 1) & 0xFFFF;
 		Cycles += 4;
 	}
 
-	function INC(reg) { // INC reg
+	function INC(reg) {
 		flags[2] = (((registers[reg] & 0xF) + 1) >> 4);
 		registers[reg] = (registers[reg] + 1) & 0xFF;
 		flags[0] = (registers[reg] == 0) ? 1 : 0;
 		flags[1] = 0;
 	}
 
-	function INCHL() { // INC (HL)
+	function INCHL() {
 		var HL = (registers[5] << 8) + registers[6];
 		var value = MemRead(HL);
 		MemWrite(HL, (value + 1) & 0xFF);
@@ -3297,7 +3206,7 @@ window.gb = function (file, canvas, options) {
 		flags[2] = (((value & 0xF) + 1) >> 4);
 	}
 
-	function DEC(reg) { // DEC reg
+	function DEC(reg) {
 		flags[2] = (((registers[reg] & 0xF) - 1) < 0) ? 1 : 0;
 		registers[reg] = (registers[reg] - 1) & 0xFF;
 		flags[0] = (registers[reg] == 0) ? 1 : 0;
@@ -3305,7 +3214,7 @@ window.gb = function (file, canvas, options) {
 
 	}
 
-	function DECHL() { // DEC (HL)
+	function DECHL() {
 		var HL = (registers[5] << 8) + registers[6];
 		var value = MemRead(HL);
 		MemWrite(HL, (value - 1) & 0xFF);
@@ -3314,17 +3223,17 @@ window.gb = function (file, canvas, options) {
 		flags[2] = (((value & 0xF) - 1) < 0) ? 1 : 0;
 	}
 
-	function LDM(reg) { // LD reg, d8
+	function LDM(reg) {
 		PC &= 0xFFFF;
 		registers[reg] = MemRead(PC++);
 	}
 
-	function LDHLM() { // LD (HL), d8
+	function LDHLM() {
 		PC &= 0xFFFF;
 		MemWrite((registers[5] << 8) + registers[6], MemRead(PC++));
 	}
 
-	function ADDHLSP() { // ADD HL, SP
+	function ADDHLSP() {
 		var HL = (registers[5] << 8) + registers[6]
 		flags[3] = (HL + SP) >> 16
 		flags[2] = ((HL & 0xFFF) + (SP & 0xFFF)) >> 12
@@ -3335,7 +3244,7 @@ window.gb = function (file, canvas, options) {
 		Cycles += 4;
 	}
 
-	function ADDHL16(reg16) { // ADD HL, reg16
+	function ADDHL16(reg16) {
 		var HL = (registers[5] << 8) + registers[6]
 		var value = (registers[reg16] << 8) + registers[reg16 + 1]
 		flags[3] = (HL + value) >> 16
@@ -3347,5 +3256,4 @@ window.gb = function (file, canvas, options) {
 		Cycles += 4;
 	}
 
-	// ----- END INSTRUCTIONS -----
 }

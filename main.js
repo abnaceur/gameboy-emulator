@@ -22,7 +22,7 @@ function createWindow() {
         webPreferences: {
             nodeIntegration: true,
             allowRunningInsecureContent: (serve) ? true : false,
-            enableRemoteModule: false // true if you want to use remote module in renderer context (ie. Angular)
+            enableRemoteModule: false
         },
     });
     win.setMenuBarVisibility(false);
@@ -43,7 +43,6 @@ function createWindow() {
         win.setMenuBarVisibility(false);
     });
     if (serve) {
-        //win.webContents.openDevTools();
         require('electron-reload')(__dirname, {
             electron: require(__dirname + "/node_modules/electron")
         });
@@ -56,11 +55,7 @@ function createWindow() {
             slashes: true
         }));
     }
-    // Emitted when the window is closed.
     win.on('closed', function () {
-        // Dereference the window object, usually you would store window
-        // in an array if your app supports multi windows, this is the time
-        // when you should delete the corresponding element.
         win = null;
     });
     return win;
@@ -73,22 +68,15 @@ try {
     electron_1.app.on('ready', function () { return setTimeout(createWindow, 400); });
     // Quit when all windows are closed.
     electron_1.app.on('window-all-closed', function () {
-        // On OS X it is common for applications and their menu bar
-        // to stay active until the user quits explicitly with Cmd + Q
         if (process.platform !== 'darwin') {
             electron_1.app.quit();
         }
     });
     electron_1.app.on('activate', function () {
-        // On OS X it's common to re-create a window in the app when the
-        // dock icon is clicked and there are no other windows open.
         if (win === null) {
             createWindow();
         }
     });
 }
 catch (e) {
-    // Catch Error
-    // throw e;
 }
-//# sourceMappingURL=main.js.map
