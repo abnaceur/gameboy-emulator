@@ -25,3 +25,8 @@ npm i
 ```bash
 npm start
 ```
+
+Ressources about MBC: 
+https://gbdev.gg8.se/wiki/articles/Memory_Bank_Controllers#MBC2_.28max_256KByte_ROM_and_512x4_bits_RAM.29
+
+https://jazz-disassemblies.blogspot.com/2013/10/gameboy-mbc-which-to-choose.html

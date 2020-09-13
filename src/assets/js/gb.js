@@ -1627,25 +1627,18 @@ window.gb = function (file, canvas, options) {
 		{ type: 1, hardware: ["RAM"], RAMBankMode: false },
 		{ type: 1, hardware: ["RAM", ""], RAMBankMode: false },
 		null,
-		{ type: 2, hardware: [] },
-		{ type: 2, hardware: [""] },
+		{ type: 2, hardware: [], RAMBankMode: false },
+		{ type: 2, hardware: ["RAM"], RAMBankMode: false },
+		{ type: 2, hardware: ["RAM", ""], RAMBankMode: false },
 		null,
 		{ type: 0, hardware: ["RAM"] },
 		{ type: 0, hardware: ["RAM", ""] },
-		null,
-		{ type: 6, hardware: [] },//MMM01
-		{ type: 6, hardware: ["RAM"] },
-		{ type: 6, hardware: ["RAM", ""] },
 		null,
 		{ type: 3, hardware: ["TIMER", ""] },
 		{ type: 3, hardware: ["TIMER", "RAM", ""] },
 		{ type: 3, hardware: [] },
 		{ type: 3, hardware: ["RAM"] },
 		{ type: 3, hardware: ["RAM", ""] },
-		null,
-		{ type: 4, hardware: [] },
-		{ type: 4, hardware: ["RAM"] },
-		{ type: 4, hardware: ["RAM", ""] },
 		null,
 		{ type: 5, hardware: [] },
 		{ type: 5, hardware: ["RAM"] },
@@ -1657,6 +1650,7 @@ window.gb = function (file, canvas, options) {
 
 	var MBCWriteHandlers = []
 	var MBCReadHandlers = []
+
 	MBCWriteHandlers[0] = function (w, v) {
 		//(do nothing)
 	}
@@ -1780,27 +1774,31 @@ window.gb = function (file, canvas, options) {
 
 	//special MBC for GBS files (start at offset)
 
-	MBCWriteHandlers[6] = function (w, v) {
-		if ((w < 0x4000) && (w >= 0x2000)) {
-			MBC.ROMbank = v;
+	MBCWriteHandlers[2] = function (w, v) {
+		if (w < 0x2000) {
+			MBC.RAMenable = ((v & 0xF) == 0xA);
+		} else if (w < 0x4000) {
+			if ((v & 0x1F) == 0) v = 1;
+			MBC.ROMbank = (MBC.ROMbank & 0x60) | (v & 0x1F)
+		} else if (w < 0x6000) {
+			if (MBC.RAMBankMode) MBC.RAMbank = (v & 3)
+			else MBC.ROMbank = (MBC.ROMbank & 0x1F) | ((v & 3) << 5)
+		} else if (w < 0x8000) {
+			MBC.RAMBankMode = (v & 1)
 		} else if ((w < 0xC000) && (w >= 0xA000)) {
-			CRAM[w - 0xA000] = v;
+			if (MBC.RAMenable) { CRAM[w - 0xA000 + MBC.RAMbank * 0x2000] = v; }
 		}
 	}
 
-	MBCReadHandlers[6] = function (a) {
+	MBCReadHandlers[2] = function (a) {
 		if (a < 0x4000) {
-			if (a - MBC.offset < 0) {
-				return MBC.lowData[a] | 0;
-			} else {
-				return game[(a - MBC.offset) + 0x70];
-			}
+			return game[a];
 		} else if (a < 0x8000) {
-			return game[((a - 0x4000) + MBC.ROMbank * 0x4000 - MBC.offset) + 0x70];
+			return game[(a - 0x4000) + MBC.ROMbank * 0x4000];
 		} else if ((a < 0xC000) && (a >= 0xA000)) {
-			return CRAM[a - 0xA000];
+			return CRAM[a - 0xA000 + MBC.RAMbank * 0x2000];
 		} else {
-			return 0;
+			return game[a];
 		}
 	}
 
@@ -1869,6 +1867,7 @@ window.gb = function (file, canvas, options) {
 		}
 		if (MBC.type > 0) { MBC.ROMbank = 1 }
 		MBCReadHandler = MBCReadHandlers[MBC.type];
+
 		MBCWriteHandler = MBCWriteHandlers[MBC.type];
 
 		VRAM = new Uint8Array((CGB) ? 0x4000 : 0x2000);
