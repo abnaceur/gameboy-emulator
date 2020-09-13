@@ -66,7 +66,6 @@ try {
     // Some APIs can only be used after this event occurs.
     // Added 400 ms to fix the black background issue while using transparent window. More detais at https://github.com/electron/electron/issues/15947
     electron_1.app.on('ready', function () { return setTimeout(createWindow, 400); });
-    // Quit when all windows are closed.
     electron_1.app.on('window-all-closed', function () {
         if (process.platform !== 'darwin') {
             electron_1.app.quit();
@@ -79,4 +78,6 @@ try {
     });
 }
 catch (e) {
+    // Catch Error
 }
+//# sourceMappingURL=main.js.map

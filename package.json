@@ -1,6 +1,6 @@
 {
   "name": "gbmu",
-  "version": "8.0.4",
+  "version": "1.0.0",
   "description": "Angular 10 with Electron (Typescript + SASS + Hot Reload)",
   "main": "main.js",
   "private": true,
